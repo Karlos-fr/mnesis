@@ -27,13 +27,12 @@ class OutputConstruction(BaseModel):
 class LanguageRealizer:
     """Réalise un frame en texte uniquement à partir des constructions fournies."""
 
-    def realize(
+    def select(
         self,
         frame: SemanticFrame,
         constructions: list[OutputConstruction],
-        context: dict[str, Any],
-    ) -> str:
-        """Réalise un frame avec la meilleure construction compatible."""
+    ) -> OutputConstruction:
+        """Retourne la meilleure construction de sortie compatible."""
         compatible = [
             construction
             for construction in constructions
@@ -42,7 +41,16 @@ class LanguageRealizer:
         if not compatible:
             raise ValueError("Aucune construction de sortie compatible.")
         compatible.sort(key=lambda item: item.confidence, reverse=True)
-        selected = compatible[0]
+        return compatible[0]
+
+    def realize(
+        self,
+        frame: SemanticFrame,
+        constructions: list[OutputConstruction],
+        context: dict[str, Any],
+    ) -> str:
+        """Réalise un frame avec la meilleure construction compatible."""
+        selected = self.select(frame, constructions)
         values = {**context, **frame.slots, "type": frame.type}
         return selected.templates[0].format_map(values)
 
