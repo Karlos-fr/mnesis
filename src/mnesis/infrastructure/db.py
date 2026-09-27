@@ -114,6 +114,9 @@ class TraceRecord(Base):
     consulted_claims: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     recalled_memories: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     affect_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    interpretations: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list)
+    triggered_rules: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    output_construction_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
 class ClaimRecord(Base):
