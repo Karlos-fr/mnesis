@@ -23,3 +23,6 @@ class DecisionTrace(BaseModel):
     consulted_claims: list[UUID] = Field(default_factory=list)
     recalled_memories: list[UUID] = Field(default_factory=list)
     affect_snapshot: dict[str, float] = Field(default_factory=dict)
+    interpretations: list[dict] = Field(default_factory=list)
+    triggered_rules: list[str] = Field(default_factory=list)
+    output_construction_id: str | None = None
