@@ -10,11 +10,14 @@ from pathlib import Path
 from uuid import UUID
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
+from mnesis.cognition.rules import DeclarativeRule
 from mnesis.domain.knowledge import Claim, ClaimStatus, Concept, KnowledgeOrigin
 from mnesis.domain.language import Lexeme, LexicalSense, MasteryLevel
 from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
+from mnesis.language.constructions import InputConstruction
+from mnesis.language.realization import OutputConstruction
 
 
 class KnowledgePackManifest(BaseModel):
@@ -35,6 +38,9 @@ class KnowledgePack(BaseModel):
     relations: list[dict]
     constructions: list[dict]
     responses: dict[str, list[str]]
+    input_constructions: list[InputConstruction] = Field(default_factory=list)
+    output_constructions: list[OutputConstruction] = Field(default_factory=list)
+    rules: list[DeclarativeRule] = Field(default_factory=list)
 
 
 class DeploymentResult(BaseModel):
@@ -46,31 +52,13 @@ class DeploymentResult(BaseModel):
 
 
 def _read_yaml(path: Path) -> object:
-    """
-    Lit un fichier YAML du paquet.
-
-    Paramètres :
-        path:
-            Chemin du fichier YAML à lire.
-
-    Retour :
-        Structure Python issue du YAML ; une structure vide si le fichier est vide.
-    """
+    """Lit un fichier YAML du paquet et retourne sa structure Python."""
     with path.open("r", encoding="utf-8") as handle:
         return yaml.safe_load(handle) or {}
 
 
 def load_knowledge_pack(path: Path) -> KnowledgePack:
-    """
-    Charge un paquet de connaissances depuis un répertoire.
-
-    Paramètres :
-        path:
-            Répertoire contenant les fichiers normalisés du paquet.
-
-    Retour :
-        Paquet validé et prêt à être déployé ou consulté.
-    """
+    """Charge un paquet de connaissances depuis un répertoire."""
     return KnowledgePack(
         manifest=KnowledgePackManifest.model_validate(_read_yaml(path / "manifest.yaml")),
         lexicon=list(_read_yaml(path / "lexicon.yaml")),
@@ -78,6 +66,18 @@ def load_knowledge_pack(path: Path) -> KnowledgePack:
         relations=list(_read_yaml(path / "relations.yaml")),
         constructions=list(_read_yaml(path / "constructions.yaml")),
         responses=dict(_read_yaml(path / "responses.yaml")),
+        input_constructions=[
+            InputConstruction.model_validate(item)
+            for item in list(_read_yaml(path / "input-constructions.yaml"))
+        ],
+        output_constructions=[
+            OutputConstruction.model_validate(item)
+            for item in list(_read_yaml(path / "output-constructions.yaml"))
+        ],
+        rules=[
+            DeclarativeRule.model_validate(item)
+            for item in list(_read_yaml(path / "rules.yaml"))
+        ],
     )
 
 
@@ -86,20 +86,7 @@ def deploy_knowledge_pack(
     pack: KnowledgePack,
     repository: KnowledgeRepository,
 ) -> DeploymentResult:
-    """
-    Déploie l'intégralité d'un paquet dans une instance.
-
-    Paramètres :
-        instance_id:
-            Instance cible du déploiement.
-        pack:
-            Paquet déjà chargé et validé.
-        repository:
-            Dépôt utilisé pour persister concepts, lexèmes et affirmations.
-
-    Retour :
-        Nombre d'éléments effectivement déployés par catégorie.
-    """
+    """Déploie concepts, lexèmes et affirmations du paquet dans une instance."""
     concepts_deployed = 0
     lexemes_deployed = 0
     claims_deployed = 0
