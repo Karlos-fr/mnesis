@@ -1,0 +1,76 @@
+- id: fr-rule-greeting
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: SOCIAL_ACT
+    - source: frame
+      path: slots.act
+      operator: eq
+      value: GREETING
+  action_type: ASSERT
+  payload:
+    type: SOCIAL_ACT
+    slots:
+      act: GREETING
+  base_score: 0.8
+- id: fr-rule-greeting-follow-up
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: SOCIAL_ACT
+    - source: frame
+      path: slots.act
+      operator: eq
+      value: GREETING
+  action_type: ASK
+  payload:
+    type: QUERY
+    slots:
+      kind: INTERLOCUTOR_STATE
+  base_score: 0.25
+  modifiers:
+    personality.curiosity: 0.3
+    personality.extraversion: 0.2
+    affect.curiosity: 0.2
+- id: fr-rule-store-is-a
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: PROPOSITION
+    - source: frame
+      path: slots.predicate
+      operator: eq
+      value: IS_A
+  action_type: STORE
+  payload:
+    from_frame: true
+  base_score: 0.8
+- id: fr-rule-definition-query
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: QUERY
+    - source: frame
+      path: slots.kind
+      operator: eq
+      value: DEFINITION
+  action_type: RETRIEVE
+  payload:
+    query_kind: DEFINITION
+    target: $frame.slots.target
+  base_score: 0.9
+- id: fr-rule-clarify-empty
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: EMPTY
+  action_type: ASSERT
+  payload:
+    type: CLARIFICATION
+    slots: {}
+  base_score: 0.4
