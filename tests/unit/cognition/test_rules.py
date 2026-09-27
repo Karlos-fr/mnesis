@@ -51,13 +51,11 @@ def test_rule_can_use_numeric_state_threshold() -> None:
         payload={"type": "QUERY", "slots": {"kind": "INTERLOCUTOR_STATE"}},
         base_score=0.5,
     )
-
     results = RuleEngine().evaluate(
         [SemanticFrame(type="EVENT")],
         {"personality": {"curiosity": 0.9}},
         [rule],
     )
-
     assert [result.action_type for result in results] == ["ASK"]
 
 
@@ -70,3 +68,19 @@ def test_unknown_rule_operator_is_rejected_at_validation() -> None:
             operator="contains_magic",
             value="EVENT",
         )
+
+
+def test_rule_payload_can_reference_current_frame() -> None:
+    """Vérifie qu'un payload de règle peut reprendre des slots sans code métier."""
+    rule = DeclarativeRule(
+        id="retrieve-definition",
+        conditions=[
+            RuleCondition(source="frame", path="type", operator="eq", value="QUERY")
+        ],
+        action_type="RETRIEVE",
+        payload={"subject_label": "$frame.slots.target", "predicate": "IS_A"},
+        base_score=0.9,
+    )
+    frame = SemanticFrame(type="QUERY", slots={"target": "chat"})
+    result = RuleEngine().evaluate([frame], {}, [rule])[0]
+    assert result.payload == {"subject_label": "chat", "predicate": "IS_A"}
