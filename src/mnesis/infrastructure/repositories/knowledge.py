@@ -23,10 +23,31 @@ class KnowledgeRepository:
         """Initialise le dépôt avec la fabrique de sessions fournie."""
         self._session_factory = session_factory
 
+    def find_concept(self, instance_id: UUID, label: str) -> Concept | None:
+        """Recherche un concept par libellé dans une instance."""
+        with self._session_factory() as session:
+            record = session.scalars(select(ConceptRecord).where(ConceptRecord.instance_id == str(instance_id), ConceptRecord.label == label.casefold()).limit(1)).first()
+        return None if record is None else Concept(id=UUID(record.id), kind=record.kind, label=record.label)
+
+    def get_concept(self, instance_id: UUID, concept_id: UUID) -> Concept | None:
+        """Retourne un concept par identifiant s'il appartient à l'instance."""
+        with self._session_factory() as session:
+            record = session.scalars(select(ConceptRecord).where(ConceptRecord.instance_id == str(instance_id), ConceptRecord.id == str(concept_id)).limit(1)).first()
+        return None if record is None else Concept(id=UUID(record.id), kind=record.kind, label=record.label)
+
+    def list_claims_for_subject(self, instance_id: UUID, subject_id: UUID, predicate: str | None = None) -> list[Claim]:
+        """Liste les affirmations d'un sujet, éventuellement filtrées par prédicat."""
+        with self._session_factory() as session:
+            query = select(ClaimRecord).where(ClaimRecord.instance_id == str(instance_id), ClaimRecord.subject_id == str(subject_id))
+            if predicate is not None:
+                query = query.where(ClaimRecord.predicate == predicate)
+            records = session.scalars(query).all()
+        return [self._to_domain(record) for record in records]
+
     def add_concept(self, instance_id: UUID, concept: Concept) -> Concept:
         """Persiste un concept local à une instance et le retourne inchangé."""
         with self._session_factory.begin() as session:
-            session.add(ConceptRecord(id=str(concept.id), instance_id=str(instance_id), kind=concept.kind, label=concept.label))
+            session.add(ConceptRecord(id=str(concept.id), instance_id=str(instance_id), kind=concept.kind, label=concept.label.casefold()))
         return concept
 
     def add_lexeme(self, instance_id: UUID, lexeme: Lexeme) -> Lexeme:
