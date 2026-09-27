@@ -15,6 +15,7 @@ from mnesis.cognition.cycle import CognitiveCycle, CognitiveEvent
 from mnesis.cognition.rules import DeclarativeRule
 from mnesis.application.construction_learning import USABLE_CONSTRUCTION_CONFIDENCE
 from mnesis.cognition.semantic_memory import SemanticMemory
+from mnesis.cognition.research import ResearchExecutor
 from mnesis.domain.memory import Episode
 from mnesis.domain.traces import DecisionTrace
 from mnesis.infrastructure.repositories.constructions import ConstructionRepository
@@ -44,6 +45,7 @@ class ConversationService:
         memories: MemoryRepository,
         traces: TraceRepository,
         semantic_memory: SemanticMemory,
+        research: ResearchExecutor | None,
         constructions: ConstructionRepository,
         language: str,
         lexicon: Lexicon,
@@ -57,6 +59,7 @@ class ConversationService:
         self.memories = memories
         self.traces = traces
         self._semantic_memory = semantic_memory
+        self._research = research
         self._constructions = constructions
         self._language = language
         self._lexicon = lexicon
