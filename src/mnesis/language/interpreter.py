@@ -33,4 +33,22 @@ class LanguageInterpreter:
         Retour :
             Toutes les interprétations candidates, dans un ordre déterministe.
         """
-        return [match.frame for match in constructions.match(text, lexicon)]
+        frames = [match.frame for match in constructions.match(text, lexicon)]
+        if frames:
+            return frames
+
+        tokens = [
+            token.strip("?!.,;:").casefold()
+            for token in text.strip().split()
+            if token.strip("?!.,;:")
+        ]
+        if len(tokens) == 1 and not lexicon.contains(tokens[0]):
+            return [
+                SemanticFrame(
+                    type="KNOWLEDGE_GAP",
+                    slots={"kind": "LEXICAL", "term": tokens[0]},
+                    confidence=1.0,
+                    provenance=["interpreter:unknown-token"],
+                )
+            ]
+        return []
