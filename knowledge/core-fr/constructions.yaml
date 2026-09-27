@@ -1,0 +1,12 @@
+- intent: SALUER
+  patterns:
+    - bonjour
+    - salut
+- intent: DEFINIR
+  patterns:
+    - "{X} est un {Y}"
+    - "{X} est une {Y}"
+- intent: DEMANDER_DEFINITION
+  patterns:
+    - "qu'est-ce qu'un {X} ?"
+    - "qu'est-ce qu'une {X} ?"

@@ -1,0 +1,4 @@
+name: core-fr
+version: 0.1.0
+locale: fr-FR
+description: Socle linguistique français minimal de Mnesis.
