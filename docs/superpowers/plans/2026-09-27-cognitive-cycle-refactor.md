@@ -606,19 +606,19 @@ Mot inconnu → règle déclarative → action `RESEARCH(kind=LEXICAL)` → sour
 - Consomme : cycle générique.
 - Produit : preuve architecturale E.
 
-- [ ] **Étape 1 : écrire un mini paquet anglais uniquement dans le test**
+- [x] **Étape 1 : écrire un mini paquet anglais uniquement dans le test**
 
 Par exemple :
 - `"hello" → SOCIAL_ACT(GREETING)`
 - sortie `SOCIAL_ACT(GREETING) → "Hello."`.
 
-- [ ] **Étape 2 : exécuter avec le même `CognitiveCycle`**
+- [x] **Étape 2 : exécuter avec le même `CognitiveCycle`**
 
-- [ ] **Étape 3 : vérifier qu’aucune modification Python n’est requise**
+- [x] **Étape 3 : vérifier qu’aucune modification Python n’est requise**
 
 Le test doit réussir sans import de module spécifique français.
 
-- [ ] **Étape 4 : commit**
+- [x] **Étape 4 : commit**
 
 ---
 
