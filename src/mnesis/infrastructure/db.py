@@ -32,6 +32,23 @@ class InstanceRecord(Base):
     affect: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
 
+class EpisodeRecord(Base):
+    """Enregistrement persistant d'un souvenir épisodique local à une instance."""
+
+    __tablename__ = "episodes"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    instance_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    occurred_at: Mapped[str] = mapped_column(String(64), nullable=False)
+    summary: Mapped[str] = mapped_column(String(1000), nullable=False)
+    importance: Mapped[float] = mapped_column(Float, nullable=False)
+    affect: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    recall_count: Mapped[int] = mapped_column(default=0, nullable=False)
+    accessibility: Mapped[float] = mapped_column(Float, nullable=False)
+
+
 class ClaimRecord(Base):
     """Enregistrement persistant d'une affirmation locale à une instance."""
 
