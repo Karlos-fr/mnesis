@@ -77,3 +77,20 @@
     type: CLARIFICATION
     slots: {}
   base_score: 0.4
+
+- id: fr-rule-interlocutor-state-query
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: QUERY
+    - source: frame
+      path: slots.kind
+      operator: eq
+      value: INTERLOCUTOR_STATE
+  action_type: ASK
+  payload:
+    type: QUERY
+    slots:
+      kind: INTERLOCUTOR_STATE
+  base_score: 0.8
