@@ -36,6 +36,7 @@ class ProcedureExecutor:
             "ASK": self._semantic_output,
             "STORE": self._store,
             "RESEARCH": self._research,
+            "RETRIEVE": self._retrieve,
         }
 
     def execute(
@@ -65,11 +66,50 @@ class ProcedureExecutor:
         action: ActionCandidate,
         context: dict[str, Any],
     ) -> ProcedureResult:
-        """Décrit explicitement une demande de persistance d'un frame."""
-        del context
-        return ProcedureResult(
-            side_effects=[{"type": "STORE_FRAME", "frame": action.payload}]
+        """Persiste un frame via le callback de mémoire sémantique injecté."""
+        raw_frame = (
+            context.get("input_frames", [None])[0]
+            if action.payload.get("from_frame")
+            else action.payload.get("frame")
         )
+        if raw_frame is None and "type" in action.payload and "slots" in action.payload:
+            raw_frame = action.payload
+        if raw_frame is None:
+            raise ValueError("STORE nécessite un frame à persister.")
+        frame = (
+            raw_frame
+            if isinstance(raw_frame, SemanticFrame)
+            else SemanticFrame.model_validate(raw_frame)
+        )
+        store_frame = context.get("store_frame")
+        if not callable(store_frame):
+            return ProcedureResult(
+                side_effects=[{"type": "STORE_FRAME", "frame": frame.model_dump()}],
+            )
+        learned = store_frame(frame) or []
+        return ProcedureResult(
+            semantic_output=frame,
+            learned_items=[str(item) for item in learned],
+        )
+
+    def _retrieve(
+        self,
+        action: ActionCandidate,
+        context: dict[str, Any],
+    ) -> ProcedureResult:
+        """Délègue une requête à la mémoire sémantique injectée."""
+        retrieve = context.get("retrieve")
+        if not callable(retrieve):
+            raise ValueError("RETRIEVE nécessite un callback de récupération.")
+        query = {key: value for key, value in action.payload.items() if key != "fallback"}
+        raw = retrieve(query)
+        if raw is None:
+            fallback = action.payload.get("fallback")
+            if fallback is None:
+                raise ValueError("La mémoire sémantique n'a produit aucun résultat.")
+            raw = fallback
+        frame = raw if isinstance(raw, SemanticFrame) else SemanticFrame.model_validate(raw)
+        return ProcedureResult(semantic_output=frame)
 
     def _research(
         self,
