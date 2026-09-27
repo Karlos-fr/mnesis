@@ -73,6 +73,20 @@ class EpisodeRecord(Base):
     accessibility: Mapped[float] = mapped_column(Float, nullable=False)
 
 
+class TraceRecord(Base):
+    """Trace persistante d'une décision cognitive locale à une instance."""
+
+    __tablename__ = "decision_traces"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    action: Mapped[str] = mapped_column(String(64), nullable=False)
+    candidate_actions: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    consulted_concepts: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    consulted_claims: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    recalled_memories: Mapped[list[str]] = mapped_column(JSON, nullable=False)
+    affect_snapshot: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+
+
 class ClaimRecord(Base):
     """Enregistrement persistant d'une affirmation locale à une instance."""
 
