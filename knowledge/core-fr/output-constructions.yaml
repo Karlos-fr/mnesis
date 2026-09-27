@@ -1,0 +1,56 @@
+- id: fr-output-greeting
+  language: fr
+  semantic_pattern:
+    type: SOCIAL_ACT
+    slots:
+      act: GREETING
+  templates:
+    - Bonjour.
+  confidence: 0.99
+  origin: knowledge_pack
+- id: fr-output-is-a
+  language: fr
+  semantic_pattern:
+    type: PROPOSITION
+    slots:
+      predicate: IS_A
+  templates:
+    - "Un {subject} est un {object}."
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-output-clarification
+  language: fr
+  semantic_pattern:
+    type: CLARIFICATION
+  templates:
+    - Je ne suis pas certain d'avoir compris. Peux-tu préciser ?
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-output-interlocutor-state
+  language: fr
+  semantic_pattern:
+    type: QUERY
+    slots:
+      kind: INTERLOCUTOR_STATE
+  templates:
+    - Comment vas-tu ?
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-output-doubt-is-a
+  language: fr
+  semantic_pattern:
+    type: UNCERTAIN_PROPOSITION
+    slots:
+      predicate: IS_A
+  templates:
+    - "Je ne suis pas certain, mais les éléments les plus fiables indiquent qu'un {subject} est un {object}."
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-output-lexical-definition
+  language: fr
+  semantic_pattern:
+    type: LEXICAL_DEFINITION
+  templates:
+    - "D'après ce que j'ai appris, « {word} » signifie : {definition}"
+  confidence: 0.95
+  origin: knowledge_pack
