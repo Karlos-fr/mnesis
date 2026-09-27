@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 from mnesis.cognition.cycle import CognitiveCycle, CognitiveEvent
 from mnesis.cognition.rules import DeclarativeRule
+from mnesis.application.construction_learning import USABLE_CONSTRUCTION_CONFIDENCE
 from mnesis.cognition.semantic_memory import SemanticMemory
 from mnesis.domain.memory import Episode
 from mnesis.domain.traces import DecisionTrace
@@ -72,9 +73,13 @@ class ConversationService:
             "personality": instance.personality.model_dump(),
             "affect": instance.affect.model_dump(),
         }
-        local_constructions = self._constructions.list_for_instance(
-            instance_id, self._language
-        )
+        local_constructions = [
+            construction
+            for construction in self._constructions.list_for_instance(
+                instance_id, self._language
+            )
+            if construction.confidence >= USABLE_CONSTRUCTION_CONFIDENCE
+        ]
         active_constructions = ConstructionSet(
             declarative_items=(
                 self._input_constructions.declarative_items
