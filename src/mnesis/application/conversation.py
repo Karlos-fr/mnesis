@@ -131,6 +131,9 @@ class ConversationService:
                 },
                 recalled_memories=[episode.id],
                 affect_snapshot=instance.affect.model_dump(),
+                interpretations=[frame.model_dump(mode="json") for frame in result.input_frames],
+                triggered_rules=[rule.rule_id for rule in result.rule_results],
+                output_construction_id=result.output_construction_id,
             )
         )
         return ConversationTurn(
