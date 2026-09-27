@@ -454,7 +454,7 @@ Le code Python ne doit contenir aucun des mots/intentions spécifiques nécessai
 - Produit :
   - `ConversationService.handle(instance_id, text) -> ConversationTurn`.
 
-- [ ] **Étape 1 : écrire le test architectural**
+- [x] **Étape 1 : écrire le test architectural**
 
 Lire le source de `conversation.py` et vérifier l’absence de :
 - `SALUER`
@@ -463,18 +463,18 @@ Lire le source de `conversation.py` et vérifier l’absence de :
 - `RELANCER`
 - `parsed.intent`.
 
-- [ ] **Étape 2 : constater l’échec sur le code actuel**
+- [x] **Étape 2 : constater l’échec sur le code actuel**
 
-- [ ] **Étape 3 : remplacer le service**
+- [x] **Étape 3 : remplacer le service**
 
 Le service :
 1. construit l’événement ;
 2. appelle `CognitiveCycle.process()` ;
 3. adapte le résultat vers `ConversationTurn`.
 
-- [ ] **Étape 4 : exécuter les tests comportementaux existants adaptés**
+- [x] **Étape 4 : exécuter les tests comportementaux existants adaptés**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
