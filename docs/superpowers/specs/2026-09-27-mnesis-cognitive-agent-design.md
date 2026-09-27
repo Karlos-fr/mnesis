@@ -964,7 +964,67 @@ Vérifier qu’un apprentissage effectué dans une instance ne fuit pas vers une
 
 Vérifier le déploiement explicite, reproductible et versionné des socles partagés.
 
-## 35. Première tranche fonctionnelle
+## 35. Socle de connaissances linguistiques français
+
+Mnesis doit disposer d’un **socle de connaissances de base en français** lui permettant de commencer à converser sans dépendre d’un LLM ni d’un service linguistique opaque.
+
+Ce socle n’est pas considéré comme un modèle pré-entraîné. Il constitue un paquet de connaissances initial, explicitement construit, versionné, inspectable et déployable.
+
+Il devra progressivement contenir :
+
+- vocabulaire français de base ;
+- pronoms, déterminants, prépositions, conjonctions et mots-outils ;
+- catégories grammaticales ;
+- flexions fréquentes ;
+- constructions syntaxiques simples ;
+- concepts conversationnels élémentaires ;
+- intentions conversationnelles de base ;
+- règles de compréhension et de génération ;
+- formulations permettant de saluer, répondre, questionner, demander une précision, exprimer un doute et relancer ;
+- connaissances minimales nécessaires pour manipuler les nombres, le temps, les personnes et les objets courants.
+
+Le socle doit rester volontairement limité. Son rôle est de fournir à Mnesis un point de départ fonctionnel à partir duquel il peut apprendre de nouveaux mots, constructions et connaissances.
+
+Il doit être distribué sous forme de paquet versionné, par exemple `core-fr`, séparé du moteur.
+
+Une capacité doit rester clairement identifiable comme :
+
+- native au moteur ;
+- fournie par le socle `core-fr` ;
+- apprise ensuite par l’instance.
+
+Cette séparation est essentielle pour mesurer ce que Mnesis apprend réellement.
+
+## 36. Interface Web conversationnelle
+
+La première version doit inclure une **interface Web simple de conversation**.
+
+Cette interface ne doit pas reprendre les codes visuels habituels des assistants d’IA générative. Elle doit donner l’impression d’échanger avec une entité conversationnelle persistante plutôt qu’avec un outil de génération de texte.
+
+Principes visuels :
+
+- sobre ;
+- élégante ;
+- très peu chargée ;
+- priorité absolue à la conversation ;
+- pas de slogans marketing ;
+- pas de suggestions de prompts ;
+- pas de boutons du type « générer », « régénérer » ou « essayer un exemple » ;
+- pas d’indicateur artificiel de « réflexion IA » ;
+- pas d’éléments décoratifs évoquant explicitement l’IA générative.
+
+L’écran principal doit essentiellement présenter :
+
+- l’identité de l’instance Mnesis ;
+- l’historique de la conversation ;
+- une zone de saisie ;
+- des indicateurs discrets d’état lorsque cela apporte une information utile.
+
+Les informations cognitives détaillées — souvenirs, niveau de confiance, émotions, provenance, traces de décision — doivent rester accessibles via des vues de diagnostic séparées et ne pas encombrer l’échange principal.
+
+L’interface sera réalisée en TypeScript et consommera l’API FastAPI. Elle ne doit contenir aucune logique cognitive métier.
+
+## 37. Première tranche fonctionnelle
 
 La première version utile doit démontrer l’architecture plutôt que chercher immédiatement une conversation très fluide.
 
@@ -984,11 +1044,14 @@ Une première instance doit pouvoir :
 12. exprimer l’incertitude ;
 13. maintenir une personnalité et un état émotionnel simples ;
 14. choisir entre répondre, demander une clarification ou effectuer une relance pertinente ;
-15. exposer une trace expliquant pourquoi l’action a été sélectionnée.
+15. exposer une trace expliquant pourquoi l’action a été sélectionnée ;
+16. charger un premier paquet `core-fr` construit dans le projet ;
+17. tenir une conversation française simple grâce à ce socle puis enrichir son vocabulaire par apprentissage ;
+18. proposer une interface Web sobre permettant un échange naturel avec l’instance.
 
 La V1 n’a **pas besoin de maîtriser un français libre et parfaitement fluide**. Un langage contrôlé mais réellement appris est préférable à une fluidité artificielle masquant de l’intelligence codée en dur.
 
-## 36. Jalons suivants
+## 38. Jalons suivants
 
 Après la première tranche fonctionnelle, le développement pourra progresser vers :
 
@@ -1005,7 +1068,7 @@ Après la première tranche fonctionnelle, le développement pourra progresser v
 
 Chaque grande capacité devra disposer de sa propre spécification détaillée, de son plan d’implémentation et de ses tests.
 
-## 37. Non-objectifs
+## 39. Non-objectifs
 
 Mnesis n’est pas destiné à devenir :
 
@@ -1017,7 +1080,7 @@ Mnesis n’est pas destiné à devenir :
 - un agent qui considère automatiquement toute information trouvée sur Internet comme vraie ;
 - un système dont le raisonnement interne serait impossible à inspecter.
 
-## 38. Critères de réussite
+## 40. Critères de réussite
 
 Le projet réussit architecturalement lorsque Mnesis peut démontrer que ses comportements sont réellement la conséquence d’états acquis.
 
@@ -1031,6 +1094,8 @@ Exemples :
 - acquérir une procédure et l’appliquer à un exemple inédit ;
 - développer des connaissances et comportements différents dans deux instances isolées ;
 - recevoir un paquet de connaissances versionné sans fusionner les historiques d’apprentissage ;
-- produire une trace inspectable expliquant une décision conversationnelle.
+- produire une trace inspectable expliquant une décision conversationnelle ;
+- démarrer depuis un socle `core-fr` versionné et identifiable, puis distinguer ce qui était fourni de ce qui a été appris ;
+- permettre une conversation simple depuis une interface Web volontairement éloignée des codes visuels des assistants génératifs.
 
 L’objectif n’est pas de donner l’illusion de l’intelligence en cachant la complexité. L’objectif est que l’intelligence apparente de Mnesis corresponde autant que possible à des mécanismes explicites, observables, testables et améliorables.
