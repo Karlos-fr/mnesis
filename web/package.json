@@ -1,0 +1,13 @@
+{
+  "name": "mnesis-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "build": "tsc -p tsconfig.json && node scripts/copy-static.mjs"
+  }
+}
