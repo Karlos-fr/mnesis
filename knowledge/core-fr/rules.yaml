@@ -61,7 +61,9 @@
   action_type: RETRIEVE
   payload:
     subject_label: $frame.slots.target
-    predicate: IS_A
+    predicates:
+      - IS_A
+      - DEFINI_COMME
     fallback:
       type: CLARIFICATION
       slots: {}
@@ -94,3 +96,19 @@
     slots:
       kind: INTERLOCUTOR_STATE
   base_score: 0.8
+
+- id: fr-rule-lexical-research
+  conditions:
+    - source: frame
+      path: type
+      operator: eq
+      value: KNOWLEDGE_GAP
+    - source: frame
+      path: slots.kind
+      operator: eq
+      value: LEXICAL
+  action_type: RESEARCH
+  payload:
+    kind: LEXICAL
+    term: $frame.slots.term
+  base_score: 0.95
