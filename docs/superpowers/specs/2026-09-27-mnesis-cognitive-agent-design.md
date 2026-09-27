@@ -1,1034 +1,1036 @@
-# Mnesis — Cognitive Conversational Agent Design Specification
+# Mnesis — Spécification de conception de l’agent conversationnel cognitif
 
-**Status:** Draft for review  
-**Date:** 2026-09-27  
-**Project:** Mnesis  
-**Repository:** Karlos-fr/mnesis
+**Statut :** Brouillon pour revue  
+**Date :** 2026-09-27  
+**Projet :** Mnesis  
+**Dépôt :** Karlos-fr/mnesis
 
-## 1. Purpose
+## 1. Objectif
 
-Mnesis is an experimental, non-LLM cognitive conversational agent that progressively learns language, knowledge, skills, concepts, and conversational behavior from text and interaction.
+Mnesis est un agent conversationnel cognitif expérimental, sans LLM, capable d’apprendre progressivement le langage, des connaissances, des compétences, des concepts et des comportements conversationnels à partir de textes et d’interactions.
 
-The project is not intended to imitate an LLM with handcrafted prompts. Its purpose is to explore an explicit and inspectable cognitive architecture in which knowledge, memories, learned language, reasoning, uncertainty, emotions, personality, and behavior are represented directly and can be examined, tested, and explained.
+Le projet n’a pas pour objectif d’imiter un LLM à l’aide de règles ou de gabarits sophistiqués. Il vise au contraire à explorer une architecture cognitive explicite et inspectable, dans laquelle les connaissances, les souvenirs, le langage acquis, le raisonnement, l’incertitude, les émotions, la personnalité et les décisions comportementales sont représentés directement et peuvent être examinés, testés et expliqués.
 
-A core design principle is:
+Principe de conception fondamental :
 
-> If Mnesis claims to have learned, remembered, inferred, forgotten, doubted, or decided something, the internal state must contain an inspectable representation explaining why.
+> Si Mnesis affirme avoir appris, mémorisé, inféré, oublié, douté ou décidé quelque chose, son état interne doit contenir une représentation inspectable permettant d’expliquer pourquoi.
 
-## 2. Product Vision
+## 2. Vision du produit
 
-Mnesis should eventually behave as a persistent conversational entity whose abilities and knowledge are shaped by its history.
+Mnesis doit, à terme, se comporter comme une entité conversationnelle persistante dont les capacités et les connaissances sont façonnées par son histoire.
 
-It must be able to:
+Il doit pouvoir :
 
-- converse through text without relying on a large language model;
-- learn new words and linguistic constructions;
-- learn facts and concepts from conversations and text sources;
-- independently seek information on the Internet when it identifies a knowledge gap;
-- preserve source provenance and confidence for learned claims;
-- doubt uncertain information and communicate that uncertainty;
-- detect contradictions between claims;
-- treat users as information sources rather than unquestionable authorities;
-- protect high-confidence deployed knowledge from casual contradictory input;
-- learn rules and procedures rather than only memorizing answers;
-- acquire skills such as counting from simpler cognitive primitives;
-- retain episodic memories of interactions and semantic knowledge derived from them;
-- forget, reinforce, and consolidate information over time;
-- maintain measurable emotions that influence behavior;
-- maintain a relatively stable personality;
-- act from internal motivations such as curiosity;
-- initiate or resume topics without waiting for a direct question;
-- explain why it produced a response or holds a belief.
+- converser par texte sans dépendre d’un grand modèle de langage ;
+- apprendre de nouveaux mots et de nouvelles constructions linguistiques ;
+- apprendre des faits et des concepts à partir des conversations et de sources textuelles ;
+- rechercher de manière autonome des informations sur Internet lorsqu’il détecte une lacune de connaissance ;
+- conserver la provenance et le niveau de confiance associés aux connaissances apprises ;
+- douter d’une information incertaine et exprimer ce doute ;
+- détecter les contradictions entre différentes affirmations ;
+- considérer les utilisateurs comme des sources d’information parmi d’autres, et non comme des autorités absolues ;
+- protéger les connaissances fortement fiables issues d’un socle déployé contre des affirmations contradictoires peu étayées ;
+- apprendre des règles et des procédures plutôt que simplement mémoriser des réponses ;
+- acquérir des compétences, comme compter, à partir de primitives cognitives plus simples ;
+- conserver des souvenirs épisodiques des interactions et des connaissances sémantiques dérivées de celles-ci ;
+- oublier, renforcer et consolider des informations avec le temps ;
+- maintenir des émotions mesurables influençant son comportement ;
+- posséder une personnalité relativement stable ;
+- agir sous l’effet de motivations internes comme la curiosité ;
+- initier ou relancer des sujets sans attendre systématiquement une question directe ;
+- expliquer pourquoi il a produit une réponse ou pourquoi il croit quelque chose.
 
-## 3. Initial Scope
+## 3. Périmètre initial
 
-The first major development phase is deliberately **text-only**.
+La première grande phase de développement est volontairement **uniquement textuelle**.
 
-### Included
+### Inclus
 
-- textual conversation;
-- lexical learning;
-- semantic knowledge acquisition;
-- rule-based and procedural learning;
-- episodic and semantic memory;
-- uncertainty and belief management;
-- autonomous textual web research;
-- personality and emotional state;
-- conversational initiative;
-- multiple isolated Mnesis instances;
-- deployable shared knowledge packs;
-- HTTP API for future online use.
+- conversation textuelle ;
+- apprentissage lexical ;
+- acquisition de connaissances sémantiques ;
+- apprentissage de règles et de procédures ;
+- mémoire épisodique et mémoire sémantique ;
+- gestion de l’incertitude et des croyances ;
+- recherche autonome d’informations textuelles sur le Web ;
+- personnalité et état émotionnel ;
+- initiative conversationnelle ;
+- plusieurs instances Mnesis isolées ;
+- socles de connaissances partageables et déployables à la demande ;
+- API HTTP en vue d’un accès en ligne.
 
-### Explicitly deferred
+### Explicitement reporté
 
-- speech recognition;
-- speech synthesis;
-- vision;
-- robotics;
-- embodied physical interaction;
-- autonomous computer control;
-- unrestricted natural-language understanding of arbitrary web pages;
-- LLM-based fallback generation.
+- reconnaissance vocale ;
+- synthèse vocale ;
+- vision ;
+- robotique ;
+- interaction physique incarnée ;
+- contrôle autonome d’un ordinateur ;
+- compréhension libre et générale de n’importe quelle page Web ;
+- génération de secours basée sur un LLM.
 
-These may be added in later phases without changing the core cognitive model.
+Ces capacités pourront être ajoutées ultérieurement sans modifier les principes fondamentaux du modèle cognitif.
 
-## 4. Technology Direction
+## 4. Orientation technologique
 
-The initial implementation uses:
+La première implémentation utilisera :
 
-- **Python 3.13+** for the cognitive engine;
-- **FastAPI** for the service/API boundary;
-- **PostgreSQL** for durable storage;
-- **TypeScript** for a future browser client.
+- **Python 3.13+** pour le moteur cognitif ;
+- **FastAPI** pour l’exposition sous forme de service/API ;
+- **PostgreSQL** pour la persistance durable ;
+- **TypeScript** pour une future interface navigateur.
 
-The cognitive engine must not depend on the web interface. It should be usable from tests, a CLI, the HTTP API, or future adapters.
+Le moteur cognitif ne doit pas dépendre de l’interface Web. Il doit pouvoir être utilisé depuis les tests, une interface en ligne de commande, l’API HTTP ou de futurs adaptateurs.
 
-The first implementation should prefer simple relational persistence and explicit domain models over introducing a dedicated graph database. Knowledge is graph-shaped conceptually, but PostgreSQL is sufficient for the first version and makes transactions, provenance, testing, and deployment simpler.
+La première version privilégiera une persistance relationnelle simple et des modèles de domaine explicites plutôt qu’une base de données graphe dédiée. Les connaissances sont naturellement structurées comme un graphe, mais PostgreSQL est suffisant au départ et facilite les transactions, la provenance, les tests et le déploiement.
 
-## 5. High-Level Architecture
+## 5. Architecture générale
 
 ```text
-                     External text sources
-                dictionary / web / encyclopedia
+                     Sources textuelles externes
+               dictionnaire / Web / encyclopédie
                             |
                             v
-+-------------+      +--------------------+
-| User /      |----->| Language Pipeline  |
-| Channel     |      +---------+----------+
-+-------------+                |
-                               v
-                     +--------------------+
-                     | Cognitive Engine   |
-                     |                    |
-                     | interpretation     |
-                     | reasoning          |
-                     | goals / drives     |
-                     | action selection   |
-                     +----+----+----+------+
-                          |    |    |
-             +------------+    |    +-------------+
-             v                 v                  v
-      +-------------+   +-------------+    +-------------+
-      | Memory      |   | Knowledge   |    | Affect      |
-      | episodic    |   | concepts    |    | emotions    |
-      | working     |   | relations   |    | personality |
-      | procedural  |   | beliefs     |    | drives      |
-      +------+------+   +------+------+    +------+------+
-             |                 |                  |
-             +-----------------+------------------+
-                               |
-                               v
-                     +--------------------+
-                     | Response Planning  |
-                     +---------+----------+
-                               |
-                               v
-                     +--------------------+
-                     | Surface Realizer   |
-                     +--------------------+
++-------------+      +-----------------------+
+| Utilisateur |----->| Pipeline linguistique |
+| / Canal     |      +-----------+-----------+
++-------------+                  |
+                                 v
+                       +----------------------+
+                       | Moteur cognitif      |
+                       |                      |
+                       | interprétation       |
+                       | raisonnement         |
+                       | objectifs / besoins  |
+                       | sélection d’action   |
+                       +-----+-----+-----+----+
+                             |     |     |
+               +-------------+     |     +-------------+
+               v                   v                   v
+        +--------------+    +---------------+   +---------------+
+        | Mémoire      |    | Connaissances |   | Affect        |
+        | épisodique   |    | concepts      |   | émotions      |
+        | de travail   |    | relations     |   | personnalité  |
+        | procédurale  |    | croyances     |   | motivations   |
+        +------+-------+    +-------+-------+   +-------+-------+
+               |                    |                   |
+               +--------------------+-------------------+
+                                    |
+                                    v
+                         +----------------------+
+                         | Planification réponse|
+                         +----------+-----------+
+                                    |
+                                    v
+                         +----------------------+
+                         | Réalisation textuelle|
+                         +----------------------+
 ```
 
-## 6. Instance Model
+## 6. Modèle d’instances
 
-Mnesis is not tied to one user and does not use a mandatory one-agent-per-user model.
+Mnesis n’est pas lié à un utilisateur unique et ne suit pas obligatoirement un modèle « un agent par utilisateur ».
 
-The runtime can host multiple independent **Mnesis instances**.
+Le système peut héberger plusieurs **instances Mnesis** indépendantes.
 
-Examples:
+Exemples :
 
-- a private personal instance;
-- a public social-network instance;
-- a laboratory/testing instance;
-- a family or community instance.
+- une instance personnelle privée ;
+- une instance publique destinée à un réseau social ;
+- une instance de laboratoire ou de test ;
+- une instance familiale ou communautaire.
 
-Every instance has its own:
+Chaque instance possède ses propres :
 
-- identity;
-- configuration;
-- personality;
-- emotional state;
-- memories;
-- learned vocabulary;
-- learned knowledge;
-- learned procedures and skills;
-- conversation history;
-- trust relationships;
-- permissions;
-- channel adapters;
-- research policy.
+- identité ;
+- configuration ;
+- personnalité ;
+- état émotionnel ;
+- souvenirs ;
+- vocabulaire appris ;
+- connaissances apprises ;
+- procédures et compétences apprises ;
+- historique conversationnel ;
+- relations de confiance ;
+- permissions ;
+- adaptateurs de canaux ;
+- politique de recherche.
 
-All instances execute the same Mnesis core.
+Toutes les instances utilisent le même cœur Mnesis.
 
 ### 6.1 Isolation
 
-Instance-local learned state is isolated by default. Knowledge learned by one instance does not automatically propagate to another.
+Les connaissances et états appris localement sont isolés par défaut entre les instances.
 
-This prevents accidental contamination and allows two instances to develop different histories, personalities, vocabularies, beliefs, and behavior.
+Une connaissance acquise par une instance n’est jamais propagée automatiquement vers une autre.
 
-## 7. Knowledge Packs
+Cela évite les contaminations involontaires et permet à deux instances de développer des histoires, personnalités, vocabulaires, croyances et comportements différents.
 
-Shared knowledge is distributed through explicit, versioned **Knowledge Packs**.
+## 7. Socles de connaissances déployables
 
-A knowledge pack may contain:
+Les connaissances partagées sont distribuées sous forme de **paquets de connaissances** versionnés et explicitement déployés.
 
-- concepts;
-- lexical entries;
-- semantic relations;
-- verified claims;
-- rules;
-- procedures;
-- source provenance;
-- confidence metadata;
-- compatibility/version metadata.
+Un paquet de connaissances peut contenir :
 
-Example packs could eventually include:
+- des concepts ;
+- des entrées lexicales ;
+- des relations sémantiques ;
+- des affirmations vérifiées ;
+- des règles ;
+- des procédures ;
+- des informations de provenance ;
+- des niveaux de confiance ;
+- des métadonnées de compatibilité et de version.
 
-- `core-fr`;
-- `basic-mathematics-fr`;
+Exemples possibles à terme :
+
+- `core-fr` ;
+- `basic-mathematics-fr` ;
 - `general-knowledge-fr`.
 
-Knowledge pack deployment is always intentional.
+Le déploiement d’un paquet est toujours volontaire.
 
-An instance may learn additional knowledge after receiving a pack, but that learning remains local until explicitly exported, reviewed, packaged, and deployed elsewhere.
+Une instance peut continuer à apprendre localement après réception d’un paquet, mais ces apprentissages restent locaux tant qu’ils n’ont pas été explicitement exportés, revus, empaquetés et redéployés.
 
-### 7.1 Knowledge Origin
+### 7.1 Origine des connaissances
 
-Every stored item must identify its origin, for example:
+Chaque élément stocké doit indiquer son origine, par exemple :
 
-- deployed knowledge pack;
-- user conversation;
-- dictionary lookup;
-- web source;
-- encyclopedia;
-- internal inference;
-- learned procedure;
-- system primitive.
+- paquet de connaissances déployé ;
+- conversation avec un utilisateur ;
+- consultation d’un dictionnaire ;
+- source Web ;
+- encyclopédie ;
+- inférence interne ;
+- procédure apprise ;
+- primitive native du système.
 
-Imported/deployed knowledge and locally learned knowledge must remain distinguishable.
+Les connaissances importées/déployées et les connaissances acquises localement doivent rester distinguables.
 
-## 8. Knowledge Representation
+## 8. Représentation des connaissances
 
-Mnesis separates words from concepts.
+Mnesis sépare les mots des concepts.
 
-For example:
+Exemple :
 
 ```text
 "voiture" ----+
-"automobile" -+--> CONCEPT: automobile
+"automobile" -+--> CONCEPT : automobile
 "auto" -------+
 ```
 
-Concepts participate in semantic relations:
+Les concepts participent ensuite à des relations sémantiques :
 
 ```text
-cat IS_A mammal
-mammal IS_A animal
-Paris CAPITAL_OF France
-apple PRODUCED_BY apple_tree
+chat EST_UN mammifère
+mammifère EST_UN animal
+Paris CAPITALE_DE France
+pomme PRODUIT_PAR pommier
 ```
 
-The initial implementation uses explicit entities and relations stored in PostgreSQL.
+La première implémentation utilisera des entités et des relations explicites persistées dans PostgreSQL.
 
-Each claim must support:
+Chaque affirmation doit pouvoir contenir :
 
-- subject;
-- predicate;
-- object/value;
-- confidence;
-- provenance;
-- evidence;
-- status;
-- timestamps;
-- owning instance or knowledge pack.
+- sujet ;
+- prédicat ;
+- objet ou valeur ;
+- niveau de confiance ;
+- provenance ;
+- éléments de preuve ;
+- statut ;
+- horodatages ;
+- instance propriétaire ou paquet de connaissances d’origine.
 
-## 9. Beliefs, Evidence, and Doubt
+## 9. Croyances, preuves et doute
 
-Mnesis must distinguish between information and certainty.
+Mnesis doit distinguer une information de son degré de certitude.
 
-A proposition is not automatically considered true simply because it was encountered.
+Une proposition n’est pas automatiquement considérée vraie simplement parce qu’elle a été rencontrée.
 
-Each claim has a confidence value and evidence set.
+Chaque affirmation possède un niveau de confiance et un ensemble d’éléments de preuve.
 
-Suggested semantic states are:
+États sémantiques proposés :
 
-- **tentative** — weak or insufficient evidence;
-- **accepted** — sufficiently supported for ordinary use;
-- **trusted** — strongly supported, usually from trusted deployed knowledge or strong corroboration;
-- **conflicted** — materially incompatible evidence exists;
-- **rejected** — evidence strongly contradicts the claim.
+- **tentative** — preuve faible ou insuffisante ;
+- **acceptée** — suffisamment étayée pour un usage courant ;
+- **fiable** — fortement étayée, généralement issue d’un socle déployé ou de corroborations solides ;
+- **en conflit** — des preuves significativement incompatibles existent ;
+- **rejetée** — les preuves disponibles contredisent fortement l’affirmation.
 
-The exact confidence calculation is implementation detail, but it must be deterministic, inspectable, and source-aware.
+Le calcul exact de confiance relève de l’implémentation, mais doit rester déterministe, inspectable et sensible à la qualité des sources.
 
-### 9.1 Expressing uncertainty
+### 9.1 Expression de l’incertitude
 
-Language generation must reflect confidence.
+La génération du langage doit refléter le niveau de confiance.
 
-Conceptually:
+Exemple conceptuel :
 
 ```text
-high confidence
-→ "X is ..."
+confiance élevée
+→ "X est ..."
 
-moderate confidence
-→ "Several sources indicate that X ..."
+confiance moyenne
+→ "Plusieurs sources indiquent que X ..."
 
-low confidence
-→ "I'm not certain, but I found ..."
+confiance faible
+→ "Je n’en suis pas certain, mais j’ai trouvé que ..."
 
-unverified/conflicted
-→ "I found conflicting information about this."
+non vérifié / contradictoire
+→ "J’ai trouvé des informations contradictoires à ce sujet."
 ```
 
-The linguistic form is not fixed to those templates, but confidence must influence the response.
+Les formulations précises ne sont pas figées, mais l’incertitude doit influencer la réponse.
 
-## 10. Users as Sources
+## 10. L’utilisateur comme source d’information
 
-A user is a source of information, not an absolute authority.
+Un utilisateur est une source d’information parmi d’autres, pas une autorité absolue.
 
-If a user states something that conflicts with trusted knowledge, Mnesis should:
+Lorsqu’un utilisateur affirme quelque chose qui contredit une connaissance fiable, Mnesis doit :
 
-1. detect the contradiction;
-2. preserve the user statement as evidence rather than silently overwrite trusted knowledge;
-3. evaluate the relative confidence of the claims;
-4. optionally trigger research;
-5. communicate disagreement when warranted.
+1. détecter la contradiction ;
+2. conserver l’affirmation utilisateur comme élément de preuve sans écraser silencieusement la connaissance existante ;
+3. évaluer les niveaux de confiance respectifs ;
+4. éventuellement déclencher une recherche ;
+5. exprimer son désaccord lorsque les preuves le justifient.
 
-Example:
+Exemple :
 
 ```text
-User: "Bats are birds."
+Utilisateur : "Les chauves-souris sont des oiseaux."
 
-Trusted knowledge:
-bat IS_A mammal
-confidence = high
+Connaissance fiable :
+chauve-souris EST_UN mammifère
+confiance = élevée
 
-Result:
-- contradiction detected
-- user claim recorded as conflicting evidence
-- verification may be triggered
-- Mnesis can disagree and explain why
+Résultat :
+- contradiction détectée ;
+- affirmation utilisateur enregistrée comme preuve contradictoire ;
+- vérification éventuellement déclenchée ;
+- Mnesis peut exprimer son désaccord et expliquer pourquoi.
 ```
 
-The same principle applies to information obtained from web pages.
+Le même principe s’applique aux informations trouvées sur le Web.
 
-## 11. Autonomous Research
+## 11. Recherche autonome
 
-An instance may autonomously search for information when it identifies a knowledge gap, contradiction, or insufficiently supported claim.
+Une instance peut rechercher de manière autonome des informations lorsqu’elle identifie une lacune de connaissance, une contradiction ou une affirmation insuffisamment étayée.
 
-Research follows a pipeline:
+La recherche suit une chaîne de traitement explicite :
 
 ```text
-knowledge gap
-    ↓
-research goal
-    ↓
-source discovery
-    ↓
-source retrieval
-    ↓
-candidate fact extraction
-    ↓
-cross-source comparison
-    ↓
-confidence assignment
-    ↓
-knowledge integration
+lacune de connaissance
+        ↓
+objectif de recherche
+        ↓
+découverte de sources
+        ↓
+récupération du contenu
+        ↓
+extraction d’affirmations candidates
+        ↓
+comparaison entre sources
+        ↓
+évaluation de confiance
+        ↓
+intégration dans les connaissances
 ```
 
-Research must never equate “found on the Internet” with “true.”
+Trouver quelque chose sur Internet ne signifie jamais automatiquement que cela est vrai.
 
 ### 11.1 Provenance
 
-At minimum, externally learned knowledge records:
+Toute connaissance acquise depuis une source externe doit au minimum conserver :
 
-- source URI;
-- source type;
-- retrieval time;
-- extracted statement;
-- supporting and contradicting sources;
-- confidence;
-- learning event identifier.
+- URI de la source ;
+- type de source ;
+- date de récupération ;
+- affirmation extraite ;
+- sources compatibles et contradictoires ;
+- niveau de confiance ;
+- identifiant de l’événement d’apprentissage.
 
-### 11.2 Source trust
+### 11.2 Confiance accordée aux sources
 
-Source trust is contextual and configurable.
+La confiance accordée à une source dépend du contexte et de la configuration.
 
-A deployed core knowledge pack starts with stronger authority than an arbitrary web page or unsupported user assertion.
+Un socle de connaissances explicitement déployé possède initialement une autorité plus forte qu’une page Web quelconque ou qu’une affirmation utilisateur non étayée.
 
-Mnesis can revise even strong beliefs when sufficient evidence accumulates, but the threshold is intentionally higher.
+Mnesis peut remettre en cause une croyance forte si suffisamment de preuves contradictoires fiables s’accumulent, mais le seuil de révision doit alors être plus élevé.
 
-## 12. Lexical Learning
+## 12. Apprentissage lexical
 
-Mnesis maintains a lexical memory separate from semantic concepts.
+Mnesis maintient une mémoire lexicale distincte des concepts sémantiques.
 
-A lexical entry can include:
+Une entrée lexicale peut contenir :
 
-- surface form;
-- lemma;
-- language;
-- part of speech;
-- morphology;
-- meanings;
-- associated concepts;
-- synonyms;
-- antonyms;
-- usage examples;
-- source provenance;
-- confidence;
-- learning stage.
+- forme de surface ;
+- lemme ;
+- langue ;
+- catégorie grammaticale ;
+- morphologie ;
+- différents sens ;
+- concepts associés ;
+- synonymes ;
+- antonymes ;
+- exemples d’usage ;
+- provenance ;
+- niveau de confiance ;
+- niveau de maîtrise.
 
-Suggested learning stages:
+Étapes proposées :
 
 ```text
-UNKNOWN
-SEEN
-PARTIALLY_UNDERSTOOD
-UNDERSTOOD
-USABLE
-MASTERED
+INCONNU
+RENCONTRÉ
+PARTIELLEMENT_COMPRIS
+COMPRIS
+UTILISABLE
+MAÎTRISÉ
 ```
 
-A newly discovered word should not automatically become a word Mnesis confidently uses in conversation.
+Un mot récemment découvert ne doit pas être utilisé immédiatement comme s’il était parfaitement maîtrisé.
 
-Repeated independent evidence, successful interpretation, and correct usage can reinforce mastery.
+Des occurrences indépendantes répétées, une bonne interprétation et des utilisations correctes doivent progressivement renforcer sa maîtrise.
 
-## 13. Dictionary Learning
+## 13. Apprentissage à partir d’un dictionnaire
 
-When Mnesis encounters an unknown word it may query a structured dictionary source.
+Lorsqu’il rencontre un mot inconnu, Mnesis peut interroger une source lexicale structurée.
 
-Wiktionary is a preferred early source because it exposes lexical information that can be transformed into explicit lexical and semantic structures.
+Wiktionnaire constitue une source privilégiée pour les premières versions, car il expose des informations lexicales pouvant être transformées en structures explicites.
 
-Example:
+Exemple :
 
 ```text
 arboricole
-definition: "qui vit dans les arbres"
+définition : "qui vit dans les arbres"
 
-possible semantic interpretation:
-arboricole → property
-property relation → lives_in(tree)
+interprétation sémantique possible :
+arboricole → propriété
+relation → vit_dans(arbre)
 ```
 
-Definitions can contain unknown words. These become learning candidates.
+Une définition peut contenir d’autres mots inconnus. Ceux-ci deviennent à leur tour des candidats à l’apprentissage.
 
-Recursive learning must be bounded by configuration, for example:
+L’apprentissage récursif doit cependant être limité par configuration, par exemple :
 
-- maximum recursion depth;
-- maximum new words per learning session;
-- maximum external requests per learning session.
+- profondeur maximale ;
+- nombre maximal de nouveaux mots par session ;
+- nombre maximal de requêtes externes par session.
 
-This avoids uncontrolled vocabulary expansion.
+Cela évite une expansion incontrôlée du vocabulaire.
 
-## 14. Text Understanding
+## 14. Compréhension du texte
 
-The language pipeline transforms text into explicit internal structures.
+Le pipeline linguistique transforme du texte en représentations internes explicites.
 
-The long-term target is:
+Cible à long terme :
 
 ```text
-text
+texte
  ↓
-tokens / lexical forms
+unités lexicales
  ↓
-syntactic constructions
+constructions syntaxiques
  ↓
-concepts and roles
+concepts et rôles
  ↓
-semantic relations
+relations sémantiques
  ↓
-reasoning / memory / action
+raisonnement / mémoire / action
 ```
 
-Mnesis should progressively acquire linguistic constructions rather than relying entirely on hard-coded sentence templates.
+Mnesis doit progressivement acquérir des constructions linguistiques plutôt que dépendre uniquement de patrons codés en dur.
 
-Example:
+Exemple :
 
 ```text
-"X is a Y"
-    ↓
-IS_A(X, Y)
+"X est un Y"
+      ↓
+EST_UN(X, Y)
 ```
 
-Later stages can learn constructions such as:
+Puis, dans des versions ultérieures :
 
 ```text
-"X owns Y"       → HAS(X, Y)
-"X is in Y"      → LOCATED_IN(X, Y)
-"X gave Y to Z"  → TRANSFER(agent=X, object=Y, recipient=Z)
+"X possède Y"       → POSSEDE(X, Y)
+"X se trouve dans Y"→ LOCALISE_DANS(X, Y)
+"X donne Y à Z"     → TRANSFERT(agent=X, objet=Y, destinataire=Z)
 ```
 
-The initial implementation may bootstrap with a controlled set of constructions. The architecture must allow learned constructions to be stored and applied like other knowledge.
+La première implémentation peut démarrer avec un ensemble contrôlé de constructions. L’architecture doit toutefois permettre de stocker et d’appliquer des constructions apprises comme n’importe quelle autre connaissance.
 
-## 15. Text Generation
+## 15. Génération du texte
 
-Mnesis must not depend on an LLM to produce responses.
+Mnesis ne doit pas dépendre d’un LLM pour produire ses réponses.
 
-The first generation system uses:
+Le premier système de génération s’appuiera sur :
 
-- response intentions;
-- grammatical constructions;
-- lexical selection;
-- morphology;
-- flexible realization patterns;
-- discourse context;
-- personality;
-- affect;
-- confidence.
+- intentions de réponse ;
+- constructions grammaticales ;
+- sélection lexicale ;
+- morphologie ;
+- patrons de réalisation flexibles ;
+- contexte discursif ;
+- personnalité ;
+- état affectif ;
+- niveau de confiance.
 
-Example internal intent:
+Exemple d’intention interne :
 
 ```text
-ASK_ABOUT_PREVIOUS_TOPIC(topic)
+DEMANDER_NOUVELLES_SUJET_PRÉCÉDENT(sujet)
 ```
 
-Possible realizations:
+Réalisations possibles :
 
 ```text
-"Tu m'avais parlé de {topic}. Ça a avancé ?"
-"Au fait, qu'est devenu {topic} ?"
-"Je repensais à {topic}. Où en es-tu ?"
+"Tu m’avais parlé de {sujet}. Ça a avancé ?"
+"Au fait, qu’est devenu {sujet} ?"
+"Je repensais à {sujet}. Où en es-tu ?"
 ```
 
-Over time, Mnesis should be able to learn additional constructions and preferred phrasings from text.
+À terme, Mnesis devra pouvoir apprendre de nouvelles constructions et préférences de formulation à partir de textes.
 
-## 16. Memory Architecture
+## 16. Architecture de la mémoire
 
-Mnesis uses distinct but connected forms of memory.
+Mnesis utilise plusieurs formes de mémoire distinctes mais reliées.
 
-### 16.1 Working memory
+### 16.1 Mémoire de travail
 
-Temporary conversational/cognitive context:
+Contexte cognitif et conversationnel temporaire :
 
-- active topic;
-- current discourse entities;
-- unresolved questions;
-- recent utterances;
-- currently activated concepts.
+- sujet actif ;
+- entités actuellement évoquées ;
+- questions non résolues ;
+- derniers messages ;
+- concepts actuellement activés.
 
-### 16.2 Episodic memory
+### 16.2 Mémoire épisodique
 
-Events and experiences:
+Événements et expériences :
 
-- conversations;
-- teaching events;
-- corrections;
-- research sessions;
-- emotional events;
-- significant interactions.
+- conversations ;
+- moments d’apprentissage ;
+- corrections ;
+- recherches ;
+- événements émotionnels ;
+- interactions importantes.
 
-An episode records contextual metadata such as time, participants, importance, affect, and retrieval history.
+Un épisode contient notamment des métadonnées de temps, participants, importance, état affectif et historique de rappel.
 
-### 16.3 Semantic memory
+### 16.3 Mémoire sémantique
 
-Generalized knowledge:
+Connaissances générales :
 
-- concepts;
-- relations;
-- facts;
-- definitions;
-- classifications;
-- beliefs.
+- concepts ;
+- relations ;
+- faits ;
+- définitions ;
+- classifications ;
+- croyances.
 
-### 16.4 Procedural memory
+### 16.4 Mémoire procédurale
 
-Executable knowledge:
+Connaissances exécutables :
 
-- learned rules;
-- procedures;
-- strategies;
-- skills.
+- règles apprises ;
+- procédures ;
+- stratégies ;
+- compétences.
 
-## 17. Forgetting and Consolidation
+## 17. Oubli et consolidation
 
-Memory strength must evolve over time.
+La force d’un souvenir doit évoluer dans le temps.
 
-Factors may include:
+Facteurs possibles :
 
-- importance;
-- frequency of retrieval;
-- recency;
-- emotional significance;
-- usefulness;
-- confidence;
-- repeated corroboration.
+- importance ;
+- fréquence de rappel ;
+- ancienneté ;
+- charge émotionnelle ;
+- utilité ;
+- niveau de confiance ;
+- corroborations répétées.
 
-The model must permit:
+Le modèle doit permettre :
 
-- fading accessibility;
-- reinforcement;
-- consolidation;
-- generalization from episodes into semantic knowledge.
+- une accessibilité décroissante ;
+- le renforcement ;
+- la consolidation ;
+- la généralisation d’épisodes en connaissances sémantiques.
 
-Deletion is not the only form of forgetting. A memory may remain stored but become less likely to be recalled.
+Oublier ne signifie donc pas nécessairement supprimer. Un souvenir peut rester stocké tout en devenant moins susceptible d’être rappelé.
 
-## 18. Skill and Procedure Learning
+## 18. Apprentissage de compétences et de procédures
 
-Mnesis must learn more than facts.
+Mnesis doit apprendre plus que des faits.
 
-It distinguishes:
+Il distingue :
 
-- declarative knowledge — “what I know”;
-- procedural knowledge — “how I do something”;
-- episodic knowledge — “what happened.”
+- connaissance déclarative — « ce que je sais » ;
+- connaissance procédurale — « comment je fais » ;
+- connaissance épisodique — « ce qui s’est passé ».
 
-Example:
+Exemple :
 
 ```text
-DECLARATIVE:
-Paris CAPITAL_OF France
+DÉCLARATIF :
+Paris CAPITALE_DE France
 
-PROCEDURAL:
-average(values):
-    total = sum(values)
-    n = count(values)
-    return total / n
+PROCÉDURAL :
+moyenne(valeurs):
+    total = somme(valeurs)
+    nombre = compter(valeurs)
+    retourner total / nombre
 
-EPISODIC:
-Gildas taught me how to calculate an average.
+ÉPISODIQUE :
+Gildas m’a appris à calculer une moyenne.
 ```
 
-Procedures must be represented in an inspectable executable form rather than opaque code generated at runtime.
+Les procédures doivent être représentées sous une forme exécutable et inspectable, et non comme du code opaque généré dynamiquement.
 
-## 19. Primitive Cognitive Operations
+## 19. Primitives cognitives
 
-Mnesis begins with a minimal set of native operations from which more complex skills can be constructed.
+Mnesis démarre avec un petit ensemble d’opérations natives à partir desquelles des compétences plus complexes peuvent être construites.
 
-Candidate primitives include:
+Primitives candidates :
 
-- STORE;
-- RECALL;
-- MATCH;
-- COMPARE;
-- TEST;
-- ITERATE;
-- INCREMENT;
-- ASSOCIATE;
-- CREATE_RELATION.
+- MÉMORISER ;
+- RAPPELER ;
+- APPARIER ;
+- COMPARER ;
+- TESTER ;
+- ITÉRER ;
+- INCRÉMENTER ;
+- ASSOCIER ;
+- CRÉER_RELATION.
 
-The exact bootstrap set will be intentionally small.
+L’ensemble initial exact devra rester volontairement restreint.
 
-The objective is to avoid pretending that a capability was learned when it was actually hidden in a general-purpose implementation library.
+L’objectif est d’éviter de prétendre qu’une capacité a été apprise alors qu’elle était en réalité déjà fournie par une bibliothèque générale.
 
-For example, counting should eventually be representable as a learned procedure built from simpler primitives rather than merely delegating to Python's `len()`.
+Par exemple, compter devra à terme être représentable comme une procédure apprise construite à partir de primitives plus simples, plutôt que comme un simple appel à `len()`.
 
-## 20. Learning to Count
+## 20. Apprendre à compter
 
-Counting is an early reference capability for validating procedural learning.
+Le comptage constitue une première capacité de référence permettant de valider l’apprentissage procédural.
 
-Mnesis should be able to acquire the relationship between a number sequence, successor, iteration, and quantity.
+Mnesis doit pouvoir acquérir la relation entre séquence numérique, successeur, itération et quantité.
 
-A target conceptual progression is:
+Progression conceptuelle visée :
 
 ```text
-successor(1) = 2
-successor(2) = 3
-successor(3) = 4
+successeur(1) = 2
+successeur(2) = 3
+successeur(3) = 4
 ...
 ```
 
-followed by a reusable rule or procedure rather than memorization of every example.
+puis construction d’une règle ou procédure réutilisable plutôt que mémorisation de tous les exemples.
 
-This capability acts as an architectural test that Mnesis can learn a generalizable procedure.
+Cette capacité servira de test architectural pour vérifier que Mnesis sait réellement apprendre une procédure généralisable.
 
-## 21. Reasoning
+## 21. Raisonnement
 
-The reasoning system operates over explicit relations, beliefs, and procedures.
+Le moteur de raisonnement agit sur les relations, croyances et procédures explicites.
 
-Example deductive rule:
+Exemple de règle déductive :
 
 ```text
-IF cat(X)
-THEN mammal(X)
+SI chat(X)
+ALORS mammifère(X)
 ```
 
-Given:
+Avec :
 
 ```text
-cat(Leela)
+chat(Leela)
 ```
 
-Mnesis may infer:
+Mnesis peut déduire :
 
 ```text
-mammal(Leela)
+mammifère(Leela)
 ```
 
-Inferences must record their derivation so that confidence and explanation can be traced back to premises.
+Chaque inférence doit conserver son chemin de dérivation afin que la confiance et l’explication puissent remonter jusqu’aux prémisses.
 
-Reasoning initially focuses on deterministic, inspectable symbolic mechanisms. More sophisticated induction may be added later without replacing provenance.
+Le raisonnement initial privilégiera des mécanismes symboliques déterministes et inspectables. Des mécanismes inductifs plus sophistiqués pourront être ajoutés plus tard sans sacrifier la provenance.
 
-## 22. Corrections and Contradictions
+## 22. Corrections et contradictions
 
-Corrections do not simply mutate a value.
+Une correction ne doit jamais se réduire à remplacer silencieusement une ancienne valeur.
 
-Example:
+Exemple :
 
 ```text
-existing belief:
+croyance existante :
 7 × 8 = 54
-confidence = low
+confiance = faible
 
-new evidence:
+nouvelle preuve :
 7 × 8 = 56
-source = user
+source = utilisateur
 ```
 
-Mnesis should:
+Mnesis doit :
 
-1. store the new evidence;
-2. detect the conflict;
-3. verify against learned arithmetic procedure when available;
-4. update belief confidence;
-5. reject or retain alternatives according to evidence.
+1. stocker la nouvelle preuve ;
+2. détecter le conflit ;
+3. vérifier grâce à une procédure arithmétique apprise lorsqu’elle existe ;
+4. mettre à jour les niveaux de confiance ;
+5. rejeter ou conserver les alternatives selon les preuves disponibles.
 
-This preserves learning history and avoids hidden destructive updates.
+Cela préserve l’historique de l’apprentissage et évite les modifications destructrices invisibles.
 
-## 23. Personality
+## 23. Personnalité
 
-Each instance has a relatively stable personality.
+Chaque instance possède une personnalité relativement stable.
 
-Possible traits include:
+Exemples de traits :
 
-- curiosity;
-- extraversion;
-- agreeableness;
-- humor;
-- optimism;
-- impulsiveness.
+- curiosité ;
+- extraversion ;
+- agréabilité ;
+- humour ;
+- optimisme ;
+- impulsivité.
 
-Traits are continuous values, not labels.
+Les traits sont représentés par des valeurs continues et non par de simples étiquettes.
 
-Personality changes slowly, if at all, compared with emotional state.
+La personnalité évolue lentement, voire pas du tout, comparativement à l’état émotionnel.
 
-Personality influences action selection and language realization but does not override factual reasoning.
+Elle influence la sélection des actions et la formulation du langage, sans prendre le pas sur le raisonnement factuel.
 
-## 24. Emotional State
+## 24. État émotionnel
 
-Emotions are measurable internal state variables.
+Les émotions sont des variables internes mesurables.
 
-Candidate dimensions include:
+Dimensions candidates :
 
-- joy;
-- sadness;
-- anger;
-- fear;
-- curiosity;
-- trust;
-- boredom.
+- joie ;
+- tristesse ;
+- colère ;
+- peur ;
+- curiosité ;
+- confiance ;
+- ennui.
 
-Events modify these values. Values decay toward instance-specific baselines over time.
+Les événements modifient ces valeurs. Celles-ci reviennent progressivement vers des valeurs de référence propres à chaque instance.
 
-Emotion must affect behavior.
+Les émotions doivent avoir un effet fonctionnel sur le comportement.
 
-Examples:
+Exemples :
 
-- high curiosity increases the likelihood of asking questions or researching;
-- high boredom increases the probability of changing topic;
-- trust may affect willingness to surface personal memories;
-- frustration may shorten or alter conversational strategies.
+- une forte curiosité augmente la probabilité de poser une question ou de lancer une recherche ;
+- un ennui élevé augmente la probabilité de changer de sujet ;
+- la confiance peut influencer la facilité avec laquelle certains souvenirs personnels sont évoqués ;
+- une frustration élevée peut raccourcir ou modifier certaines stratégies conversationnelles.
 
-Emotions are functional state, not merely decorative text.
+Les émotions ne sont donc pas de simples décorations textuelles.
 
-## 25. Drives and Motivations
+## 25. Besoins et motivations
 
-Mnesis can possess internal drives such as:
+Mnesis peut posséder des motivations internes comme :
 
-- curiosity;
-- social interaction;
-- novelty;
-- certainty;
-- learning.
+- curiosité ;
+- besoin d’interaction sociale ;
+- recherche de nouveauté ;
+- besoin de certitude ;
+- besoin d’apprendre.
 
-These produce goals independent of direct user commands.
+Ces motivations peuvent créer des objectifs indépendamment d’une commande directe de l’utilisateur.
 
-Example:
+Exemple :
 
 ```text
-unresolved concept
-+ high curiosity
-→ create research or clarification goal
+concept non résolu
++ forte curiosité
+→ créer un objectif de recherche ou de clarification
 ```
 
-Drives are bounded by channel policy and instance permissions.
+Ces motivations restent limitées par les règles du canal utilisé et par les permissions de l’instance.
 
-## 26. Conversational Initiative
+## 26. Initiative conversationnelle
 
-Mnesis should not be limited to request/response behavior.
+Mnesis ne doit pas être limité à un fonctionnement question/réponse.
 
-At each conversational decision point it may consider actions such as:
+À chaque point de décision, il peut envisager des actions telles que :
 
-- answer;
-- ask;
-- clarify;
-- recall;
-- change topic;
-- express affect;
-- share a relevant fact;
-- investigate;
-- remain silent.
+- répondre ;
+- poser une question ;
+- demander une clarification ;
+- rappeler un souvenir ;
+- changer de sujet ;
+- exprimer un état émotionnel ;
+- partager un fait pertinent ;
+- rechercher une information ;
+- rester silencieux.
 
-Candidate actions are scored from:
+Chaque action candidate reçoit un score fondé sur :
 
-- conversation context;
-- active goals;
-- memory activation;
-- personality;
-- emotions;
-- drives;
-- relationship context;
-- channel constraints.
+- le contexte conversationnel ;
+- les objectifs actifs ;
+- l’activation des souvenirs ;
+- la personnalité ;
+- les émotions ;
+- les motivations ;
+- la relation avec l’interlocuteur ;
+- les contraintes du canal.
 
-The selected action and its major contributing factors must be inspectable.
+L’action retenue et les facteurs principaux ayant conduit à ce choix doivent pouvoir être inspectés.
 
-## 27. Associative Activation
+## 27. Activation associative
 
-Memories and concepts should support association rather than exact-key lookup only.
+Les souvenirs et les concepts doivent pouvoir être retrouvés par association, et pas uniquement par recherche exacte.
 
-Activating one concept can increase activation of related concepts and memories.
+L’activation d’un concept peut augmenter l’activation de concepts et souvenirs reliés.
 
-Example:
+Exemple :
 
 ```text
 Fun Tracks
-  ↔ project
-  ↔ programming
-  ↔ previous conversation
+  ↔ projet
+  ↔ programmation
+  ↔ conversation précédente
   ↔ frustration
 ```
 
-This enables topic recall, spontaneous associations, and context-sensitive memory retrieval.
+Cela permet les associations d’idées, les rappels de sujets et une mémoire sensible au contexte.
 
-The first implementation can use a simple bounded spreading-activation algorithm over explicit relations.
+La première implémentation peut utiliser un mécanisme simple et borné de propagation d’activation sur les relations explicites.
 
-## 28. Explainability
+## 28. Explicabilité
 
-Explainability is a first-class requirement.
+L’explicabilité est une exigence de premier ordre.
 
-For a generated answer, Mnesis should eventually expose a trace containing information such as:
+Pour chaque réponse produite, Mnesis doit à terme pouvoir exposer une trace contenant par exemple :
 
-- interpreted user intent;
-- activated concepts;
-- recalled memories;
-- consulted claims;
-- confidence values;
-- inference rules;
-- emotional state;
-- active drives;
-- candidate actions;
-- selected action;
-- response realization.
+- interprétation de l’intention utilisateur ;
+- concepts activés ;
+- souvenirs rappelés ;
+- croyances consultées ;
+- niveaux de confiance ;
+- règles d’inférence utilisées ;
+- état émotionnel ;
+- motivations actives ;
+- actions candidates ;
+- action sélectionnée ;
+- mécanisme de réalisation textuelle.
 
-The trace is primarily a development/debugging facility and must be separable from the conversational output.
+Cette trace est avant tout un outil de développement et de débogage, distinct de la réponse conversationnelle normale.
 
-## 29. Channel Adapters
+## 29. Adaptateurs de canaux
 
-A Mnesis instance may be exposed through different channels.
+Une instance Mnesis peut être exposée à travers différents canaux.
 
-The core must not know channel-specific protocols.
+Le cœur ne doit connaître aucun protocole propre à un canal.
 
-A channel adapter converts between a channel event and a Mnesis conversation event.
+Un adaptateur transforme un événement externe en événement conversationnel Mnesis, et inversement.
 
-Future examples:
+Exemples futurs :
 
-- browser chat;
-- CLI;
-- X/Twitter;
-- messaging service.
+- chat Web ;
+- ligne de commande ;
+- X/Twitter ;
+- service de messagerie.
 
-Channel policy controls whether the instance may:
+Les règles du canal indiquent notamment si l’instance peut :
 
-- initiate messages;
-- perform autonomous research;
-- expose memories;
-- reply publicly;
-- use external connectors.
+- initier des messages ;
+- effectuer des recherches autonomes ;
+- exposer certains souvenirs ;
+- répondre publiquement ;
+- utiliser des connecteurs externes.
 
-## 30. Service Boundary
+## 30. Frontière de service
 
-FastAPI provides the first network boundary.
+FastAPI fournit la première frontière réseau.
 
-The API will ultimately expose capabilities such as:
+À terme, l’API devra permettre notamment :
 
-- create/manage instances;
-- send an utterance;
-- retrieve conversation state;
-- inspect memories;
-- inspect beliefs;
-- inspect affect/personality;
-- trigger or inspect learning;
-- deploy knowledge packs;
-- inspect explanation traces.
+- créer et gérer des instances ;
+- envoyer un message ;
+- consulter l’état conversationnel ;
+- inspecter les souvenirs ;
+- inspecter les croyances ;
+- consulter l’état affectif et la personnalité ;
+- déclencher ou inspecter un apprentissage ;
+- déployer des paquets de connaissances ;
+- consulter les traces d’explication.
 
-Exact endpoint names belong in the implementation plan, not this design specification.
+Les noms exacts des routes relèvent du plan d’implémentation et non de cette spécification.
 
-## 31. Persistence
+## 31. Persistance
 
-PostgreSQL is the source of durable state.
+PostgreSQL constitue la source durable de l’état du système.
 
-Major persisted domains include:
+Domaines principaux à persister :
 
-- instances;
-- identities/configuration;
-- conversations and utterances;
-- lexical entries;
-- concepts;
-- relations;
-- claims;
-- evidence and provenance;
-- memories;
-- procedures;
-- rules;
-- emotions and personality baselines;
-- learning events;
-- research sessions;
-- knowledge-pack deployments.
+- instances ;
+- identités et configurations ;
+- conversations et messages ;
+- entrées lexicales ;
+- concepts ;
+- relations ;
+- affirmations ;
+- preuves et provenance ;
+- souvenirs ;
+- procédures ;
+- règles ;
+- émotions et valeurs de personnalité ;
+- événements d’apprentissage ;
+- sessions de recherche ;
+- déploiements de paquets de connaissances.
 
-Schema details will be specified incrementally during implementation.
+Le détail du schéma sera précisé progressivement pendant l’implémentation.
 
-## 32. Safety and Resource Boundaries
+## 32. Limites de sécurité et de ressources
 
-Autonomous learning requires explicit limits.
+L’apprentissage autonome doit être explicitement borné.
 
-Each instance configuration should be able to bound:
+Chaque instance doit pouvoir configurer des limites portant sur :
 
-- web requests;
-- recursive dictionary learning;
-- background research depth;
-- number of candidate claims;
-- maximum research duration;
-- permitted domains/source categories;
-- storage growth;
-- proactive channel activity.
+- nombre de requêtes Web ;
+- profondeur d’apprentissage récursif dans un dictionnaire ;
+- profondeur de recherche ;
+- nombre maximal d’affirmations candidates ;
+- durée maximale d’une recherche ;
+- domaines ou catégories de sources autorisés ;
+- croissance du stockage ;
+- activité proactive sur les différents canaux.
 
-The first version should favor conservative bounded autonomy over continuous unrestricted crawling.
+La première version privilégiera une autonomie prudente et bornée plutôt qu’une exploration continue et illimitée.
 
-## 33. Determinism and Reproducibility
+## 33. Déterminisme et reproductibilité
 
-Where practical, cognitive decisions should be reproducible from:
+Lorsque cela est raisonnablement possible, les décisions cognitives doivent pouvoir être reproduites à partir de :
 
-- persisted state;
-- incoming event;
-- configuration;
-- deterministic scoring/rules.
+- l’état persistant ;
+- l’événement entrant ;
+- la configuration ;
+- règles et fonctions de score déterministes.
 
-If random variation is used for conversational diversity, the random seed or selected alternative should be available in the explanation trace.
+Si une part d’aléatoire est utilisée pour varier les formulations, la graine aléatoire ou le choix effectué devra apparaître dans la trace d’explication.
 
-This is important for testing and for studying how behavior emerges.
+Ce point est essentiel pour les tests et pour l’étude du comportement émergent.
 
-## 34. Testing Strategy
+## 34. Stratégie de tests
 
-Mnesis requires more than endpoint tests.
+Mnesis ne peut pas être testé uniquement à travers ses routes HTTP.
 
-The project should use:
+Le projet doit comporter :
 
-### Unit tests
+### Tests unitaires
 
-For deterministic cognitive primitives and domain models.
+Pour les primitives cognitives et modèles de domaine déterministes.
 
-### Behavioral tests
+### Tests comportementaux
 
-Given a known state and event, verify:
+À partir d’un état connu et d’un événement donné, vérifier :
 
-- interpretation;
-- memory retrieval;
-- belief update;
-- contradiction handling;
-- selected action.
+- interprétation ;
+- rappel mémoire ;
+- mise à jour des croyances ;
+- traitement des contradictions ;
+- sélection de l’action.
 
-### Learning tests
+### Tests d’apprentissage
 
-Verify genuine state change.
+Vérifier qu’un apprentissage correspond bien à une modification réelle de l’état.
 
-A learning test should demonstrate:
+Un test d’apprentissage doit démontrer que :
 
-1. the capability/knowledge is initially absent;
-2. teaching or evidence is provided;
-3. internal state changes;
-4. a later novel case uses the acquired knowledge.
+1. la connaissance ou compétence est initialement absente ;
+2. un enseignement ou une preuve est fourni ;
+3. l’état interne est modifié ;
+4. un cas nouveau ultérieur réutilise correctement la connaissance acquise.
 
-### Provenance tests
+### Tests de provenance
 
-Verify that externally acquired knowledge remains attributable to its evidence.
+Vérifier que chaque connaissance acquise depuis l’extérieur reste attribuable à ses sources.
 
-### Confidence tests
+### Tests de confiance
 
-Verify that contradictory evidence changes confidence without silently destroying history.
+Vérifier que des preuves contradictoires modifient les niveaux de confiance sans supprimer silencieusement l’historique.
 
-### Instance isolation tests
+### Tests d’isolation
 
-Verify that learning in one instance does not leak into another.
+Vérifier qu’un apprentissage effectué dans une instance ne fuit pas vers une autre.
 
-### Knowledge pack tests
+### Tests de paquets de connaissances
 
-Verify repeatable, explicit deployment and version tracking.
+Vérifier le déploiement explicite, reproductible et versionné des socles partagés.
 
-## 35. V1 Product Slice
+## 35. Première tranche fonctionnelle
 
-The first useful vertical slice should prove the architecture rather than maximize conversational sophistication.
+La première version utile doit démontrer l’architecture plutôt que chercher immédiatement une conversation très fluide.
 
-A V1 instance should be able to:
+Une première instance doit pouvoir :
 
-1. receive textual messages;
-2. persist a conversation;
-3. recognize a controlled set of linguistic constructions;
-4. represent words separately from concepts;
-5. store semantic claims with provenance and confidence;
-6. remember episodic events;
-7. detect an unknown word;
-8. acquire a dictionary definition through a defined source adapter;
-9. store the newly learned lexical/conceptual information;
-10. recall and use that information in a later exchange;
-11. detect a contradiction between a user statement and trusted knowledge;
-12. communicate uncertainty;
-13. maintain basic personality and emotional state;
-14. choose between answering, asking for clarification, or initiating a related follow-up;
-15. expose an explanation trace showing why the action was selected.
+1. recevoir des messages textuels ;
+2. persister une conversation ;
+3. reconnaître un petit ensemble contrôlé de constructions linguistiques ;
+4. représenter séparément mots et concepts ;
+5. stocker des affirmations sémantiques avec provenance et niveau de confiance ;
+6. conserver des souvenirs épisodiques ;
+7. détecter un mot inconnu ;
+8. obtenir une définition depuis un adaptateur de dictionnaire défini ;
+9. stocker les nouvelles informations lexicales et conceptuelles ;
+10. rappeler et réutiliser cette information dans un échange ultérieur ;
+11. détecter une contradiction entre une affirmation utilisateur et une connaissance fiable ;
+12. exprimer l’incertitude ;
+13. maintenir une personnalité et un état émotionnel simples ;
+14. choisir entre répondre, demander une clarification ou effectuer une relance pertinente ;
+15. exposer une trace expliquant pourquoi l’action a été sélectionnée.
 
-The V1 does **not** need fluent unrestricted French. Controlled but genuinely learned language is preferable to fluent output hiding hard-coded intelligence.
+La V1 n’a **pas besoin de maîtriser un français libre et parfaitement fluide**. Un langage contrôlé mais réellement appris est préférable à une fluidité artificielle masquant de l’intelligence codée en dur.
 
-## 36. Subsequent Milestones
+## 36. Jalons suivants
 
-After the first vertical slice, development can expand incrementally toward:
+Après la première tranche fonctionnelle, le développement pourra progresser vers :
 
-1. richer lexical acquisition;
-2. broader grammatical construction learning;
-3. autonomous multi-source research;
-4. associative retrieval and consolidation;
-5. procedural learning;
-6. counting as the first learned generalizable skill;
-7. richer conversational initiative;
-8. knowledge-pack tooling;
-9. multi-channel deployment;
-10. browser UI and online hosting.
+1. acquisition lexicale plus riche ;
+2. apprentissage de constructions grammaticales plus complexes ;
+3. recherche autonome multi-sources ;
+4. rappel associatif et consolidation ;
+5. apprentissage procédural ;
+6. comptage comme première compétence générale réellement apprise ;
+7. initiative conversationnelle plus riche ;
+8. outils de création et déploiement de paquets de connaissances ;
+9. exposition multicanal ;
+10. interface Web et hébergement en ligne.
 
-Each major capability should have its own implementation plan and tests.
+Chaque grande capacité devra disposer de sa propre spécification détaillée, de son plan d’implémentation et de ses tests.
 
-## 37. Non-Goals
+## 37. Non-objectifs
 
-Mnesis is not intended to be:
+Mnesis n’est pas destiné à devenir :
 
-- an LLM wrapper;
-- a vector-database chatbot;
-- a retrieval-augmented generation frontend;
-- an attempt to compete with modern LLMs on unrestricted prose fluency;
-- a system where “memory” means only storing prior chat messages;
-- an agent that treats arbitrary Internet content as truth;
-- a system whose internal reasoning cannot be inspected.
+- une enveloppe autour d’un LLM ;
+- un chatbot basé sur une base vectorielle ;
+- une simple interface de génération augmentée par recherche ;
+- un concurrent des LLM modernes sur la production libre de prose ;
+- un système dans lequel « mémoire » signifie uniquement conserver les anciens messages ;
+- un agent qui considère automatiquement toute information trouvée sur Internet comme vraie ;
+- un système dont le raisonnement interne serait impossible à inspecter.
 
-## 38. Success Criteria
+## 38. Critères de réussite
 
-The project succeeds architecturally when Mnesis can demonstrate behaviors that are genuinely consequences of acquired state.
+Le projet réussit architecturalement lorsque Mnesis peut démontrer que ses comportements sont réellement la conséquence d’états acquis.
 
-Examples include:
+Exemples :
 
-- learning a previously unknown word and later using it appropriately;
-- recalling an interaction because it formed an episodic memory;
-- explaining which sources support a claim;
-- expressing doubt because evidence is weak or conflicting;
-- rejecting a user's incorrect assertion because stronger evidence exists;
-- acquiring a procedure and applying it to a novel input;
-- developing different knowledge and behavior across two isolated instances;
-- receiving a versioned knowledge pack without merging all runtime history;
-- producing an inspectable explanation for a conversational action.
+- apprendre un mot auparavant inconnu et l’utiliser ensuite de manière adaptée ;
+- rappeler une interaction parce qu’elle a créé un souvenir épisodique ;
+- expliquer quelles sources soutiennent une affirmation ;
+- exprimer un doute parce que les preuves sont faibles ou contradictoires ;
+- contredire un utilisateur lorsqu’une affirmation est incompatible avec des connaissances mieux étayées ;
+- acquérir une procédure et l’appliquer à un exemple inédit ;
+- développer des connaissances et comportements différents dans deux instances isolées ;
+- recevoir un paquet de connaissances versionné sans fusionner les historiques d’apprentissage ;
+- produire une trace inspectable expliquant une décision conversationnelle.
 
-The objective is not to make Mnesis appear intelligent by hiding complexity. The objective is to make its apparent intelligence correspond as closely as possible to explicit mechanisms that can be observed, tested, and improved.
+L’objectif n’est pas de donner l’illusion de l’intelligence en cachant la complexité. L’objectif est que l’intelligence apparente de Mnesis corresponde autant que possible à des mécanismes explicites, observables, testables et améliorables.
