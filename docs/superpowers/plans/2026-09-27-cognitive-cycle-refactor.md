@@ -227,7 +227,7 @@ git commit -m "feat: persister les constructions apprises"
   - `RuleResult`
   - `RuleEngine.evaluate(frames, state, rules) -> list[RuleResult]`.
 
-- [ ] **Étape 1 : écrire le test d’une règle de salutation comme donnée**
+- [x] **Étape 1 : écrire le test d’une règle de salutation comme donnée**
 
 Entrée :
 `SOCIAL_ACT(act=GREETING)`
@@ -237,11 +237,11 @@ proposer action `SOCIAL_RESPONSE`.
 
 Le test doit définir la règle dans ses données, pas via une classe spécialisée.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
 Exécuter : `pytest tests/unit/cognition/test_rules.py -v`.
 
-- [ ] **Étape 3 : implémenter l’évaluation générique**
+- [x] **Étape 3 : implémenter l’évaluation générique**
 
 Support minimal :
 - égalité ;
@@ -249,11 +249,11 @@ Support minimal :
 - seuil numérique sur état/personnalité ;
 - production d’une action candidate.
 
-- [ ] **Étape 4 : tester règle invalide**
+- [x] **Étape 4 : tester règle invalide**
 
 Un opérateur inconnu ou une structure invalide est rejeté lors de la validation.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ```bash
 git add src/mnesis/cognition tests/unit/cognition
