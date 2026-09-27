@@ -36,6 +36,7 @@ class CognitiveResult(BaseModel):
     ranked_actions: list[ActionCandidate]
     selected_action: ActionCandidate
     procedure_result: ProcedureResult
+    output_construction_id: str
 
 
 class CognitiveCycle:
@@ -88,9 +89,12 @@ class CognitiveCycle:
             raise ValueError(
                 "L'action sélectionnée ne produit pas de sortie sémantique réalisable."
             )
+        selected_output = self._realizer.select(
+            procedure_result.semantic_output, output_constructions
+        )
         response = self._realizer.realize(
             procedure_result.semantic_output,
-            output_constructions,
+            [selected_output],
             state,
         )
         return CognitiveResult(
@@ -101,4 +105,5 @@ class CognitiveCycle:
             ranked_actions=ranked,
             selected_action=selected,
             procedure_result=procedure_result,
+            output_construction_id=selected_output.id,
         )
