@@ -150,9 +150,73 @@ npm test
 npm run build
 ```
 
+
+## Architecture cognitive apprenable
+
+La conversation n'est plus pilotée par une liste d'intentions codées en Python. Le flux principal est désormais :
+
+```text
+texte
+  ↓
+constructions d'entrée déclaratives
+  ↓
+frames sémantiques
+  ↓
+règles déclaratives
+  ↓
+actions candidates + scoring
+  ↓
+primitives cognitives
+  ↓
+construction de sortie déclarative
+  ↓
+texte
+```
+
+`ConversationService` ne connaît donc ni `SALUER`, ni `DEFINIR`, ni une autre intention métier. Le français de démarrage réside dans `knowledge/core-fr/`.
+
+### Ajouter une nouvelle formulation sans modifier Python
+
+Une construction d'entrée associe une forme à un sens. Une instance peut par exemple recevoir localement une construction équivalente à :
+
+```yaml
+language: fr
+pattern:
+  - literal: coucou
+semantics:
+  type: SOCIAL_ACT
+  slots:
+    act: GREETING
+```
+
+Le même moteur peut immédiatement interpréter cette forme si la construction est active. Les constructions apprises localement restent isolées entre instances.
+
+### Apprentissage d'une construction
+
+Une construction enseignée commence avec une confiance faible. Elle n'est utilisée qu'après renforcement au-delà du seuil d'utilisation. Cela permet à Mnesis de distinguer une hypothèse linguistique d'une construction réellement maîtrisée.
+
+### Recherche autonome
+
+Un mot isolé inconnu devient un `KNOWLEDGE_GAP`. Les règles de `core-fr` peuvent alors proposer l'action générique `RESEARCH`. L'exécuteur spécialisé choisit la source lexicale, apprend la définition avec provenance et confiance, puis cette connaissance devient réutilisable dans une conversation ultérieure.
+
+### Diagnostic cognitif
+
+Les traces exposent notamment :
+
+- les interprétations sémantiques candidates ;
+- les règles déclenchées ;
+- les actions candidates et leurs scores ;
+- l'action sélectionnée ;
+- la construction de sortie utilisée ;
+- l'état affectif observé.
+
+Cela permet de comprendre pourquoi Mnesis a répondu d'une certaine manière sans afficher ces détails dans la conversation principale.
+
 ## Documentation de conception
 
-- spécification : `docs/superpowers/specs/2026-09-27-mnesis-cognitive-agent-design.md` ;
+- spécification initiale : `docs/superpowers/specs/2026-09-27-mnesis-cognitive-agent-design.md` ;
+- spécification du cycle cognitif : `docs/superpowers/specs/2026-09-27-cognitive-cycle-refactor-design.md` ;
+- plan du refactor cognitif : `docs/superpowers/plans/2026-09-27-cognitive-cycle-refactor.md` ;
 - plan V1 : `docs/superpowers/plans/2026-09-27-mnesis-v1.md` ;
 - règles de développement : `AGENT.md`.
 
