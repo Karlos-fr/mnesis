@@ -19,7 +19,7 @@ def test_message_returns_response_and_trace() -> None:
     assert body["response_text"] == "Bonjour."
     trace = client.get(f"/api/v1/instances/{instance_id}/traces/{body['trace_id']}")
     assert trace.status_code == 200
-    assert trace.json()["action"] == "RÉPONDRE"
+    assert trace.json()["action"] == "ASSERT"
 
 
 def test_blank_message_is_rejected_without_cognitive_event() -> None:
