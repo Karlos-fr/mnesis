@@ -116,8 +116,14 @@ class ProcedureExecutor:
         action: ActionCandidate,
         context: dict[str, Any],
     ) -> ProcedureResult:
-        """Décrit explicitement un objectif de recherche à exécuter ensuite."""
-        del context
+        """Exécute une recherche injectée ou expose son objectif comme effet."""
+        research = context.get("research")
+        if not callable(research):
+            return ProcedureResult(
+                side_effects=[{"type": "RESEARCH", "goal": action.payload}]
+            )
+        outcome = research(action.payload)
         return ProcedureResult(
-            side_effects=[{"type": "RESEARCH", "goal": action.payload}]
+            semantic_output=outcome.semantic_output,
+            learned_items=outcome.learned_items,
         )
