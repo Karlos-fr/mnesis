@@ -68,6 +68,7 @@ class CognitiveCycle:
         input_constructions: ConstructionSet,
         rules: list[DeclarativeRule],
         output_constructions: list[OutputConstruction],
+        procedure_context: dict[str, Any] | None = None,
     ) -> CognitiveResult:
         """Exécute un cycle cognitif complet à partir de ressources déclaratives."""
         frames = self._interpreter.interpret(event.text, input_constructions, lexicon)
@@ -77,7 +78,12 @@ class CognitiveCycle:
         if not ranked:
             raise ValueError("Aucune règle n'a produit d'action candidate.")
         selected = ranked[0]
-        procedure_result = self._procedures.execute(selected, state)
+        execution_context = {
+            **state,
+            **(procedure_context or {}),
+            "input_frames": activation.frames,
+        }
+        procedure_result = self._procedures.execute(selected, execution_context)
         if procedure_result.semantic_output is None:
             raise ValueError(
                 "L'action sélectionnée ne produit pas de sortie sémantique réalisable."
