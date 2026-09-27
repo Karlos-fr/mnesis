@@ -316,7 +316,7 @@ git commit -m "feat: ajouter le moteur générique de sélection d’actions"
   - `ProcedureResult(semantic_output, learned_items, side_effects)`
   - `ProcedureExecutor.execute(action, context) -> ProcedureResult`.
 
-- [ ] **Étape 1 : écrire les tests pour primitives génériques**
+- [x] **Étape 1 : écrire les tests pour primitives génériques**
 
 Couvrir :
 - `ASSERT` : produire une proposition sémantique ;
@@ -324,15 +324,15 @@ Couvrir :
 - `STORE` : demander persistance d’un frame ;
 - `RESEARCH` : produire un objectif de recherche.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : implémenter uniquement les primitives**
+- [x] **Étape 3 : implémenter uniquement les primitives**
 
 Aucune procédure `SALUER` ou `DEFINIR`.
 
-- [ ] **Étape 4 : vérifier**
+- [x] **Étape 4 : vérifier**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
