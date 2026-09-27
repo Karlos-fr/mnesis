@@ -60,8 +60,11 @@
       value: DEFINITION
   action_type: RETRIEVE
   payload:
-    query_kind: DEFINITION
-    target: $frame.slots.target
+    subject_label: $frame.slots.target
+    predicate: IS_A
+    fallback:
+      type: CLARIFICATION
+      slots: {}
   base_score: 0.9
 - id: fr-rule-clarify-empty
   conditions:
