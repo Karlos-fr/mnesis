@@ -49,6 +49,41 @@ class ConstructionRepository:
             )
         return construction
 
+
+    def get(
+        self,
+        instance_id: UUID,
+        construction_id: str,
+    ) -> InputConstruction | None:
+        """Retourne une construction locale par identifiant ou None."""
+        with self._session_factory() as session:
+            record = session.get(ConstructionRecord, construction_id)
+            if record is None or record.instance_id != str(instance_id):
+                return None
+            return self._to_domain(record)
+
+    def update(
+        self,
+        instance_id: UUID,
+        construction: InputConstruction,
+    ) -> InputConstruction:
+        """Met à jour une construction existante appartenant à l'instance."""
+        with self._session_factory.begin() as session:
+            record = session.get(ConstructionRecord, construction.id)
+            if record is None or record.instance_id != str(instance_id):
+                raise ValueError("Construction introuvable pour cette instance.")
+            record.pattern = construction.pattern
+            record.semantics = construction.semantics
+            record.confidence = construction.confidence
+            record.origin = construction.origin
+            record.usage_count = construction.usage_count
+            record.reinforced_at = (
+                construction.reinforced_at.isoformat()
+                if construction.reinforced_at is not None
+                else None
+            )
+        return construction
+
     def list_for_instance(
         self,
         instance_id: UUID,
