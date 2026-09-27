@@ -2,8 +2,7 @@
 Structures linguistiques de Mnesis.
 
 Rôle :
-    Décrire à la fois les constructions historiques de compatibilité et les
-    nouvelles constructions déclaratives indépendantes de toute logique métier.
+    Décrire les constructions déclaratives indépendantes de toute logique métier.
 """
 
 from dataclasses import dataclass, field
@@ -40,14 +39,6 @@ class Lexicon:
         return word.casefold() in self.words
 
 
-@dataclass(frozen=True)
-class Construction:
-    """Ancienne construction regex conservée temporairement pour compatibilité."""
-
-    intent: str
-    pattern: str
-
-
 class InputConstruction(BaseModel):
     """
     Décrit une construction linguistique d'entrée entièrement déclarative.
@@ -76,27 +67,9 @@ class ConstructionMatch(BaseModel):
 
 @dataclass(frozen=True)
 class ConstructionSet:
-    """Regroupe les constructions historiques et déclaratives actives."""
+    """Regroupe uniquement les constructions déclaratives actives."""
 
-    items: tuple[Construction, ...] = field(default_factory=tuple)
     declarative_items: tuple[InputConstruction, ...] = field(default_factory=tuple)
-
-    @classmethod
-    def default_french(cls) -> "ConstructionSet":
-        """Retourne l'ancien jeu français, conservé jusqu'à la migration de core-fr."""
-        return cls(
-            items=(
-                Construction("SALUER", r"^(bonjour|salut)[.!]?$"),
-                Construction(
-                    "DEFINIR",
-                    r"^(?P<subject>[^ ]+) est (un|une) (?P<object>[^ ?!.]+)[.!]?$",
-                ),
-                Construction(
-                    "DEMANDER_DEFINITION",
-                    r"^qu['’]est-ce qu['’](un|une) (?P<concept>[^ ?!.]+) ?\?$",
-                ),
-            )
-        )
 
     def match(self, text: str, lexicon: Lexicon) -> list[ConstructionMatch]:
         """
