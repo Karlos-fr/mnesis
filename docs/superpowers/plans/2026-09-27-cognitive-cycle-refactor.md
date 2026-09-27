@@ -632,7 +632,7 @@ Le test doit réussir sans import de module spécifique français.
 - Consomme : toute la nouvelle architecture.
 - Produit : scénario de référence du moteur apprenable.
 
-- [ ] **Étape 1 : couvrir le scénario complet**
+- [x] **Étape 1 : couvrir le scénario complet**
 
 Le test doit démontrer :
 
@@ -649,11 +649,11 @@ Le test doit démontrer :
 11. personnalité influençant le scoring ;
 12. trace cognitive complète.
 
-- [ ] **Étape 2 : lancer et constater les éventuels écarts**
+- [x] **Étape 2 : lancer et constater les éventuels écarts**
 
-- [ ] **Étape 3 : corriger uniquement ce qui appartient à ce refactor**
+- [x] **Étape 3 : corriger uniquement ce qui appartient à ce refactor**
 
-- [ ] **Étape 4 : lancer la vérification complète**
+- [x] **Étape 4 : lancer la vérification complète**
 
 Exécuter :
 - `pytest -v`
@@ -663,7 +663,7 @@ Exécuter :
 - `cd web && npm run build`
 - migration Alembic sur base SQLite vierge.
 
-- [ ] **Étape 5 : documenter la nouvelle architecture**
+- [x] **Étape 5 : documenter la nouvelle architecture**
 
 README :
 - moteur générique ;
@@ -672,7 +672,7 @@ README :
 - apprentissage local ;
 - exemple de diagnostic.
 
-- [ ] **Étape 6 : commit**
+- [x] **Étape 6 : commit**
 
 ```bash
 git add .
@@ -680,6 +680,9 @@ git commit -m "refactor: remplacer les intents par un cycle cognitif apprenable"
 ```
 
 ---
+
+
+**Note de vérification :** `pytest`, les tests Web, le build TypeScript, `compileall` et les migrations Alembic sur une base SQLite vierge ont été exécutés avec succès. `ruff` et `mypy` ne sont pas installés dans l'environnement d'exécution courant ; leur absence a été constatée explicitement et ils n'ont pas été déclarés comme validés.
 
 ## Hors de ce plan
 
