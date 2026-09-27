@@ -103,6 +103,11 @@ class ConversationService:
                 "retrieve": lambda query: self._semantic_memory.retrieve(
                     instance_id, query
                 ),
+                **(
+                    {"research": lambda goal: self._research.execute(instance_id, goal)}
+                    if self._research is not None
+                    else {}
+                ),
             },
         )
         episode = self.memories.add_episode(
