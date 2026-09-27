@@ -83,7 +83,7 @@ knowledge/core-fr/
   - `SemanticFrame(type: str, slots: dict[str, SemanticValue], confidence: float, provenance: list[str])`
   - structures capables de représenter proposition, requête, acte social et objectif sans dépendance linguistique.
 
-- [ ] **Étape 1 : écrire les tests en échec**
+- [x] **Étape 1 : écrire les tests en échec**
 
 Couvrir :
 - représentation d’une proposition `IS_A(chat, animal)` ;
@@ -91,20 +91,20 @@ Couvrir :
 - confiance bornée ;
 - sérialisation stable.
 
-- [ ] **Étape 2 : lancer les tests**
+- [x] **Étape 2 : lancer les tests**
 
 Exécuter : `pytest tests/unit/semantic/test_frames.py -v`  
 Attendu : échec car les modèles n’existent pas.
 
-- [ ] **Étape 3 : implémenter les modèles minimaux**
+- [x] **Étape 3 : implémenter les modèles minimaux**
 
 Pas de classe spécifique `GreetingFrame` ou `DefinitionFrame` : uniquement des structures génériques.
 
-- [ ] **Étape 4 : vérifier**
+- [x] **Étape 4 : vérifier**
 
 Exécuter : `pytest tests/unit/semantic/test_frames.py -v`
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ```bash
 git add src/mnesis/semantic tests/unit/semantic
