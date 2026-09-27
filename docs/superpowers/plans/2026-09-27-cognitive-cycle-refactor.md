@@ -518,7 +518,7 @@ Aucun ajout de condition `coucou`.
   - `ConstructionLearningService.teach(instance_id, form, semantic_frame, source) -> LearnedConstruction`
   - `reinforce(instance_id, construction_id, evidence) -> LearnedConstruction`.
 
-- [ ] **Étape 1 : écrire le test du scénario “Ça roule ?”**
+- [x] **Étape 1 : écrire le test du scénario “Ça roule ?”**
 
 1. inconnu au départ ;
 2. enseignement `Ça roule ? → QUERY(INTERLOCUTOR_STATE)` ;
@@ -527,17 +527,17 @@ Aucun ajout de condition `coucou`.
 5. seuil d’utilisation atteint ;
 6. expression comprise sur nouvelle conversation.
 
-- [ ] **Étape 2 : vérifier l’échec**
+- [x] **Étape 2 : vérifier l’échec**
 
-- [ ] **Étape 3 : implémenter apprentissage + renforcement**
+- [x] **Étape 3 : implémenter apprentissage + renforcement**
 
 Seuil V1 explicite et documenté, par exemple `usable_confidence >= 0.70`.
 
-- [ ] **Étape 4 : ajouter test d’isolation**
+- [x] **Étape 4 : ajouter test d’isolation**
 
 Instance B ne comprend toujours pas cette construction.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
