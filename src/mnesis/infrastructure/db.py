@@ -32,6 +32,30 @@ class InstanceRecord(Base):
     affect: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
 
 
+class ConceptRecord(Base):
+    """Concept sémantique local à une instance."""
+
+    __tablename__ = "concepts"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(64), nullable=False)
+    label: Mapped[str] = mapped_column(String(255), nullable=False)
+
+
+class LexemeRecord(Base):
+    """Forme lexicale locale à une instance et liens vers ses concepts."""
+
+    __tablename__ = "lexemes"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    surface: Mapped[str] = mapped_column(String(255), nullable=False)
+    lemma: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    language: Mapped[str] = mapped_column(String(16), nullable=False)
+    part_of_speech: Mapped[str] = mapped_column(String(64), nullable=False)
+    senses: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False)
+    mastery: Mapped[str] = mapped_column(String(32), nullable=False)
+
+
 class EpisodeRecord(Base):
     """Enregistrement persistant d'un souvenir épisodique local à une instance."""
 
