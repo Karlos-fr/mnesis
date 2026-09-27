@@ -553,17 +553,17 @@ Instance B ne comprend toujours pas cette construction.
 - Consomme : KnowledgeGap / action `RESEARCH`.
 - Produit : `ResearchExecutor.execute(goal) -> LearningResult`.
 
-- [ ] **Étape 1 : écrire le test**
+- [x] **Étape 1 : écrire le test**
 
 Mot inconnu → règle déclarative → action `RESEARCH(kind=LEXICAL)` → source dictionnaire → apprentissage.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : déplacer la dépendance dictionnaire hors du service conversationnel**
+- [x] **Étape 3 : déplacer la dépendance dictionnaire hors du service conversationnel**
 
-- [ ] **Étape 4 : vérifier provenance et confiance**
+- [x] **Étape 4 : vérifier provenance et confiance**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
