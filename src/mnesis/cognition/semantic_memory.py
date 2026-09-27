@@ -34,6 +34,7 @@ class SemanticMemory:
             raise ValueError(
                 "Le frame à stocker doit fournir subject, predicate et object."
             )
+
         subject = self._ensure_concept(instance_id, subject_label, "entity")
         obj = self._ensure_concept(instance_id, object_label, "concept")
         claim = self._repository.add_claim(
@@ -54,41 +55,76 @@ class SemanticMemory:
         instance_id: UUID,
         query: dict[str, object],
     ) -> SemanticFrame | None:
-        """Récupère la meilleure relation correspondant à une requête générique."""
+        """Récupère la meilleure connaissance correspondant à une requête générique."""
         subject_label = query.get("subject_label")
-        predicate = query.get("predicate")
-        if not isinstance(subject_label, str) or not isinstance(predicate, str):
+        if not isinstance(subject_label, str):
             return None
-        subject = self._repository.find_concept(instance_id, subject_label.casefold())
+        raw_predicates = query.get("predicates")
+        if isinstance(raw_predicates, list):
+            predicates = [
+                value for value in raw_predicates if isinstance(value, str)
+            ]
+        else:
+            predicate = query.get("predicate")
+            predicates = [predicate] if isinstance(predicate, str) else []
+        if not predicates:
+            return None
+
+        subject = self._repository.find_concept(
+            instance_id, subject_label.casefold()
+        )
         if subject is None:
             return None
-        claims = self._repository.list_claims_for_subject(instance_id, subject.id, predicate)
-        if not claims:
-            return None
-        assessment = self._beliefs.evaluate(claims)
-        preferred = next(
-            claim for claim in claims if claim.id == assessment.preferred_claim_id
-        )
-        if preferred.object_id is None:
-            return None
-        obj = self._repository.get_concept(instance_id, preferred.object_id)
-        if obj is None:
-            return None
-        frame_type = (
-            "UNCERTAIN_PROPOSITION"
-            if assessment.status is ClaimStatus.CONFLICTED
-            else "PROPOSITION"
-        )
-        return SemanticFrame(
-            type=frame_type,
-            slots={
-                "predicate": predicate,
-                "subject": subject.label,
-                "object": obj.label,
-            },
-            confidence=assessment.confidence,
-            provenance=[f"claim:{claim_id}" for claim_id in assessment.all_claim_ids],
-        )
+
+        for predicate in predicates:
+            claims = self._repository.list_claims_for_subject(
+                instance_id, subject.id, predicate
+            )
+            if not claims:
+                continue
+            assessment = self._beliefs.evaluate(claims)
+            preferred = next(
+                claim
+                for claim in claims
+                if claim.id == assessment.preferred_claim_id
+            )
+            provenance = [
+                f"claim:{claim_id}" for claim_id in assessment.all_claim_ids
+            ]
+
+            if preferred.object_id is not None:
+                obj = self._repository.get_concept(
+                    instance_id, preferred.object_id
+                )
+                if obj is None:
+                    continue
+                frame_type = (
+                    "UNCERTAIN_PROPOSITION"
+                    if assessment.status is ClaimStatus.CONFLICTED
+                    else "PROPOSITION"
+                )
+                return SemanticFrame(
+                    type=frame_type,
+                    slots={
+                        "predicate": predicate,
+                        "subject": subject.label,
+                        "object": obj.label,
+                    },
+                    confidence=assessment.confidence,
+                    provenance=provenance,
+                )
+
+            if isinstance(preferred.literal, str):
+                return SemanticFrame(
+                    type="LEXICAL_DEFINITION",
+                    slots={
+                        "word": subject.label,
+                        "definition": preferred.literal,
+                    },
+                    confidence=assessment.confidence,
+                    provenance=provenance,
+                )
+        return None
 
     def _ensure_concept(
         self,
@@ -97,7 +133,9 @@ class SemanticMemory:
         kind: str,
     ) -> Concept:
         """Retourne un concept existant ou en crée un localement."""
-        existing = self._repository.find_concept(instance_id, label.casefold())
+        existing = self._repository.find_concept(
+            instance_id, label.casefold()
+        )
         if existing is not None:
             return existing
         return self._repository.add_concept(
