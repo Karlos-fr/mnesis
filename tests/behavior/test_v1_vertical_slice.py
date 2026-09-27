@@ -1,30 +1,27 @@
-"""
-Scénario vertical de référence pendant le refactor cognitif.
+"""Scénario vertical final du cycle cognitif apprenable de Mnesis.
 
 Rôle :
-    Préserver les garanties de mémoire, apprentissage, doute et isolation pendant
-    la migration, avant le scénario end-to-end définitif de la tâche 16.
+    Démontrer que les capacités conversationnelles viennent des données, des
+    règles et de l'apprentissage, et non de branches métier codées en Python.
 """
 
 from pathlib import Path
 
-from mnesis.application.learning import DictionaryEntry, LexicalLearningService
-from mnesis.cognition.semantic_memory import SemanticMemory
+from mnesis.api.app import create_app
+from mnesis.application.construction_learning import ConstructionLearningService
+from mnesis.application.learning import DictionaryEntry
+from mnesis.domain.affect import AffectState, Personality
 from mnesis.domain.instances import MnesisInstance
-from mnesis.domain.knowledge import Claim, ClaimStatus, Concept, KnowledgeOrigin
-from mnesis.infrastructure.db import create_database, create_schema
 from mnesis.infrastructure.knowledge_packs import deploy_knowledge_pack, load_knowledge_pack
-from mnesis.infrastructure.repositories.instances import InstanceRepository
-from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
-from mnesis.infrastructure.repositories.memory import MemoryRepository
-from mnesis.infrastructure.repositories.traces import TraceRepository
+from mnesis.language.constructions import InputConstruction
+from mnesis.semantic.frames import SemanticFrame
 
 
 class VerticalDictionarySource:
-    """Source dictionnaire déterministe du scénario vertical."""
+    """Source lexicale déterministe utilisée par le scénario vertical."""
 
     def lookup(self, word: str, locale: str) -> DictionaryEntry | None:
-        """Retourne uniquement la définition contrôlée du mot arboricole."""
+        """Retourne une définition uniquement pour le mot arboricole."""
         if word.casefold() != "arboricole":
             return None
         return DictionaryEntry(
@@ -36,75 +33,82 @@ class VerticalDictionarySource:
         )
 
 
-def test_v1_vertical_slice() -> None:
-    """Préserve les garanties de la V1 pendant la migration du cycle."""
-    database = create_database("sqlite+pysqlite:///:memory:")
-    create_schema(database.engine)
-    instances = InstanceRepository(database.session_factory)
-    knowledge = KnowledgeRepository(database.session_factory)
-    memories = MemoryRepository(database.session_factory)
-    traces = TraceRepository(database.session_factory)
-    personal = instances.create(MnesisInstance.create("Personnel"))
-    isolated = instances.create(MnesisInstance.create("Isolée"))
+def test_v1_vertical_slice_uses_learnable_cognitive_cycle() -> None:
+    """Valide le cycle déclaratif, l'apprentissage, l'isolation et la trace."""
+    app = create_app(
+        "sqlite+pysqlite:///:memory:",
+        dictionary_source=VerticalDictionarySource(),
+    )
+    services = app.state.services
+    personal = services.instances.create(MnesisInstance.create("Personnel"))
+    isolated = services.instances.create(MnesisInstance.create("Isolée"))
     pack = load_knowledge_pack(Path("knowledge/core-fr"))
 
-    deployment = deploy_knowledge_pack(personal.id, pack, knowledge)
+    deployment = deploy_knowledge_pack(personal.id, pack, services.knowledge)
+    assert deployment.concepts_deployed >= 1
+    assert deployment.lexemes_deployed >= 1
     assert deployment.claims_deployed >= 1
-    assert knowledge.find_concept(personal.id, "salutation") is not None
-    assert knowledge.find_lexeme(personal.id, "bonjour") is not None
 
-    learning = LexicalLearningService(knowledge, VerticalDictionarySource())
-    assert knowledge.find_lexeme(personal.id, "arboricole") is None
-    learned = learning.learn_unknown_word(personal.id, "arboricole")
-    assert learned.success is True
-    assert knowledge.find_lexeme(personal.id, "arboricole") is not None
-    assert any(
-        claim.origin is KnowledgeOrigin.DICTIONARY
-        for claim in knowledge.list_claims(personal.id)
-    )
+    greeting = services.conversation.handle(personal.id, "Bonjour")
+    assert greeting.response_text == "Bonjour."
 
-    subject = knowledge.add_concept(
+    stored = services.conversation.handle(personal.id, "chat est un animal")
+    assert stored.response_text == "Un chat est un animal."
+    recalled = services.conversation.handle(personal.id, "Qu'est-ce qu'un chat ?")
+    assert recalled.response_text == "Un chat est un animal."
+
+    services.constructions.add(
         personal.id,
-        Concept(kind="entity", label="test-conflit"),
-    )
-    first = knowledge.add_concept(
-        personal.id,
-        Concept(kind="category", label="mammifère"),
-    )
-    second = knowledge.add_concept(
-        personal.id,
-        Concept(kind="category", label="oiseau"),
-    )
-    knowledge.add_claim(
-        personal.id,
-        Claim(
-            subject_id=subject.id,
-            predicate="IS_A",
-            object_id=first.id,
-            confidence=0.99,
-            status=ClaimStatus.TRUSTED,
-            origin=KnowledgeOrigin.KNOWLEDGE_PACK,
+        InputConstruction(
+            id="local-coucou",
+            language="fr",
+            pattern=[{"literal": "coucou"}],
+            semantics={"type": "SOCIAL_ACT", "slots": {"act": "GREETING"}},
+            confidence=0.9,
+            origin="learned:test",
         ),
     )
-    knowledge.add_claim(
-        personal.id,
-        Claim(
-            subject_id=subject.id,
-            predicate="IS_A",
-            object_id=second.id,
-            confidence=0.7,
-            status=ClaimStatus.TENTATIVE,
-            origin=KnowledgeOrigin.USER,
-        ),
-    )
-    recalled = SemanticMemory(knowledge).retrieve(
-        personal.id,
-        {"subject_label": "test-conflit", "predicate": "IS_A"},
-    )
-    assert recalled is not None
-    assert recalled.type == "UNCERTAIN_PROPOSITION"
+    assert services.conversation.handle(personal.id, "Coucou").response_text == "Bonjour."
 
-    assert memories.recent(personal.id, 20) == []
-    assert traces.get(personal.id, personal.id) is None
-    assert knowledge.list_claims(isolated.id) == []
-    assert knowledge.find_lexeme(isolated.id, "arboricole") is None
+    construction_learning = ConstructionLearningService(services.constructions)
+    taught = construction_learning.teach(
+        personal.id,
+        "Ça roule ?",
+        SemanticFrame(type="QUERY", slots={"kind": "INTERLOCUTOR_STATE"}),
+        source="user://teaching",
+    )
+    assert "pas certain" in services.conversation.handle(personal.id, "Ça roule ?").response_text
+    construction_learning.reinforce(personal.id, taught.id, "user://confirmation")
+    assert services.conversation.handle(personal.id, "Ça roule ?").response_text == "Comment vas-tu ?"
+    assert "pas certain" in services.conversation.handle(isolated.id, "Ça roule ?").response_text
+
+    learned_word = services.conversation.handle(personal.id, "arboricole")
+    assert "appris" in learned_word.response_text
+    lexical_recall = services.conversation.handle(personal.id, "Qu'est-ce qu'un arboricole ?")
+    assert "vit dans les arbres" in lexical_recall.response_text.casefold()
+
+    services.conversation.handle(personal.id, "salutation est un animal")
+    doubt = services.conversation.handle(personal.id, "Qu'est-ce qu'une salutation ?")
+    assert "pas certain" in doubt.response_text
+    assert "acte_conversationnel" in doubt.response_text
+
+    curious = services.instances.create(
+        MnesisInstance(
+            id=MnesisInstance.create("tmp").id,
+            name="Curieuse",
+            locale="fr-FR",
+            personality=Personality(curiosity=0.95, extraversion=0.8),
+            affect=AffectState(curiosity=0.95),
+        )
+    )
+    curious_turn = services.conversation.handle(curious.id, "Bonjour")
+    assert curious_turn.response_text == "Comment vas-tu ?"
+
+    trace = services.traces.get(personal.id, doubt.trace_id)
+    assert trace is not None
+    assert trace.interpretations
+    assert trace.triggered_rules
+    assert trace.candidate_actions
+    assert trace.output_construction_id is not None
+
+    assert services.knowledge.find_lexeme(isolated.id, "arboricole") is None
