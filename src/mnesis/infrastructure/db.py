@@ -62,6 +62,24 @@ class LexemeRecord(Base):
     mastery: Mapped[str] = mapped_column(String(32), nullable=False)
 
 
+class ConstructionRecord(Base):
+    """Construction linguistique déclarative appartenant à une instance ou un socle."""
+
+    __tablename__ = "constructions"
+
+    id: Mapped[str] = mapped_column(String(255), primary_key=True)
+    instance_id: Mapped[str | None] = mapped_column(
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=True, index=True
+    )
+    language: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    pattern: Mapped[list[dict[str, str]]] = mapped_column(JSON, nullable=False)
+    semantics: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False)
+    origin: Mapped[str] = mapped_column(String(32), nullable=False)
+    usage_count: Mapped[int] = mapped_column(default=0, nullable=False)
+    reinforced_at: Mapped[str | None] = mapped_column(String(64), nullable=True)
+
+
 class EpisodeRecord(Base):
     """Enregistrement persistant d'un souvenir épisodique local à une instance."""
 

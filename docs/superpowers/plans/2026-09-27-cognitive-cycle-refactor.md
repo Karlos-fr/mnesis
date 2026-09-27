@@ -177,15 +177,15 @@ git commit -m "feat: rendre les constructions linguistiques déclaratives"
   - `ConstructionRepository.list_for_instance(instance_id, language)`
   - distinction `knowledge_pack` / `learned`.
 
-- [ ] **Étape 1 : écrire le test d’isolation**
+- [x] **Étape 1 : écrire le test d’isolation**
 
 Une construction ajoutée à A est visible dans A mais pas B.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
 Exécuter : `pytest tests/integration/test_construction_isolation.py -v`.
 
-- [ ] **Étape 3 : implémenter schéma et dépôt**
+- [x] **Étape 3 : implémenter schéma et dépôt**
 
 Champs minimum :
 - id ;
@@ -198,13 +198,13 @@ Champs minimum :
 - usage_count ;
 - reinforced_at.
 
-- [ ] **Étape 4 : vérifier la migration**
+- [x] **Étape 4 : vérifier la migration**
 
 Exécuter :
 - `alembic upgrade head`
 - test d’isolation.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ```bash
 git add src/mnesis/infrastructure alembic tests/integration

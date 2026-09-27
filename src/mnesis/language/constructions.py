@@ -7,6 +7,7 @@ Rôle :
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -61,6 +62,8 @@ class InputConstruction(BaseModel):
     semantics: dict[str, Any]
     confidence: float = Field(default=1.0, ge=0.0, le=1.0)
     origin: str = Field(min_length=1)
+    usage_count: int = Field(default=0, ge=0)
+    reinforced_at: datetime | None = None
 
 
 class ConstructionMatch(BaseModel):
