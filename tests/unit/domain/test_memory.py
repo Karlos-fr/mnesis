@@ -15,7 +15,14 @@ from mnesis.domain.traces import DecisionTrace
 
 def test_episode_keeps_context_and_recall_metadata() -> None:
     """Vérifie qu'un épisode conserve contexte, importance et rappel."""
-    episode = Episode(instance_id=uuid4(), occurred_at=datetime.now(UTC), summary="Discussion sur un projet", importance=0.7, affect={"joy": 0.6})
+    episode = Episode(
+        instance_id=uuid4(),
+        occurred_at=datetime.now(UTC),
+        summary="Discussion sur un projet",
+        importance=0.7,
+        affect={"joy": 0.6},
+    )
+
     assert episode.recall_count == 0
     assert episode.accessibility == 1.0
     assert episode.importance == 0.7
@@ -23,7 +30,27 @@ def test_episode_keeps_context_and_recall_metadata() -> None:
 
 def test_decision_trace_records_consulted_state() -> None:
     """Vérifie qu'une trace relie concepts, croyances, souvenirs et décision."""
-    trace = DecisionTrace(instance_id=uuid4(), action="RÉPONDRE", candidate_actions={"RÉPONDRE": 0.9, "RELANCER": 0.3}, consulted_concepts=[uuid4()], consulted_claims=[uuid4()], recalled_memories=[uuid4()], affect_snapshot={"curiosity": 0.7})
+    trace = DecisionTrace(
+        instance_id=uuid4(),
+        action="RÉPONDRE",
+        candidate_actions={"RÉPONDRE": 0.9, "RELANCER": 0.3},
+        consulted_concepts=[uuid4()],
+        consulted_claims=[uuid4()],
+        recalled_memories=[uuid4()],
+        affect_snapshot={"curiosity": 0.7},
+    )
+
     assert trace.action == "RÉPONDRE"
     assert trace.candidate_actions["RÉPONDRE"] == 0.9
     assert trace.consulted_concepts
+
+
+def test_decision_trace_exposes_confidence() -> None:
+    """Vérifie qu'une trace porte un niveau de confiance inspectable."""
+    trace = DecisionTrace(
+        instance_id=uuid4(),
+        action="RÉPONDRE",
+        confidence=0.82,
+        candidate_actions={"RÉPONDRE": 0.9},
+    )
+    assert trace.confidence == 0.82
