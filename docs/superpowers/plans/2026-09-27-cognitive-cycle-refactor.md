@@ -383,7 +383,7 @@ Sélection déterministe pour la V1 ; variation pourra venir ensuite.
 - Produit :
   - `CognitiveCycle.process(instance_id, event) -> CognitiveResult`.
 
-- [ ] **Étape 1 : écrire le test d’un cycle de salutation sans logique métier**
+- [x] **Étape 1 : écrire le test d’un cycle de salutation sans logique métier**
 
 Le test assemble :
 - construction d’entrée ;
@@ -393,18 +393,18 @@ Le test assemble :
 
 Le cycle doit produire `Bonjour.`.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : implémenter l’orchestration minimale**
+- [x] **Étape 3 : implémenter l’orchestration minimale**
 
 Pipeline strict :
 interpret → activate → rules → actions → execute → realize → trace.
 
-- [ ] **Étape 4 : ajouter test de non-reconnaissance**
+- [x] **Étape 4 : ajouter test de non-reconnaissance**
 
 Aucune construction → une règle générique peut proposer `CLARIFY`.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
@@ -427,19 +427,19 @@ Aucune construction → une règle générique peut proposer `CLARIFY`.
   - doute ;
   - relance.
 
-- [ ] **Étape 1 : écrire les tests de contenu**
+- [x] **Étape 1 : écrire les tests de contenu**
 
 Vérifier que le paquet charge constructions d’entrée, sorties et règles.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : migrer les comportements existants dans YAML**
+- [x] **Étape 3 : migrer les comportements existants dans YAML**
 
 Le code Python ne doit contenir aucun des mots/intentions spécifiques nécessaires au test.
 
-- [ ] **Étape 4 : vérifier**
+- [x] **Étape 4 : vérifier**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
