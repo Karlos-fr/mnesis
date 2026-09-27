@@ -62,7 +62,7 @@ class RuleEngine:
                         RuleResult(
                             rule_id=rule.id,
                             action_type=rule.action_type,
-                            payload=rule.payload,
+                            payload=_substitute_payload(rule.payload, frame, state),
                             base_score=rule.base_score,
                             modifiers=rule.modifiers,
                         )
@@ -101,3 +101,21 @@ def _read_path(root: Any, path: str) -> Any:
         else:
             return None
     return current
+
+
+def _substitute_payload(value: Any, frame: SemanticFrame, state: dict[str, Any]) -> Any:
+    """Substitue récursivement les références $frame.* et $state.* d'un payload."""
+    if isinstance(value, str):
+        if value.startswith("$frame."):
+            return _read_path(frame.model_dump(), value[len("$frame."):])
+        if value.startswith("$state."):
+            return _read_path(state, value[len("$state."):])
+        return value
+    if isinstance(value, list):
+        return [_substitute_payload(item, frame, state) for item in value]
+    if isinstance(value, dict):
+        return {
+            key: _substitute_payload(item, frame, state)
+            for key, item in value.items()
+        }
+    return value
