@@ -487,22 +487,22 @@ Le service :
 - Consomme : dépôt de constructions + cycle.
 - Produit : preuve architecturale B.
 
-- [ ] **Étape 1 : écrire le test**
+- [x] **Étape 1 : écrire le test**
 
 Après démarrage :
 - ajouter une construction `"Coucou" → SOCIAL_ACT(GREETING)` uniquement par donnée ;
 - envoyer « Coucou » ;
 - vérifier réponse sociale correcte.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : corriger uniquement le chargement dynamique si nécessaire**
+- [x] **Étape 3 : corriger uniquement le chargement dynamique si nécessaire**
 
 Aucun ajout de condition `coucou`.
 
-- [ ] **Étape 4 : vérifier**
+- [x] **Étape 4 : vérifier**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
