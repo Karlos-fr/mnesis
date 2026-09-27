@@ -21,6 +21,7 @@ from mnesis.cognition.rules import RuleEngine
 from mnesis.cognition.semantic_memory import SemanticMemory
 from mnesis.infrastructure.db import create_database, create_schema
 from mnesis.infrastructure.knowledge_packs import load_knowledge_pack
+from mnesis.infrastructure.repositories.constructions import ConstructionRepository
 from mnesis.infrastructure.repositories.instances import InstanceRepository
 from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
 from mnesis.infrastructure.repositories.memory import MemoryRepository
@@ -46,6 +47,7 @@ def create_app(
     database = create_database(database_url)
     create_schema(database.engine)
     instance_repository = InstanceRepository(database.session_factory)
+    construction_repository = ConstructionRepository(database.session_factory)
     knowledge_repository = KnowledgeRepository(database.session_factory)
     memory_repository = MemoryRepository(database.session_factory)
     trace_repository = TraceRepository(database.session_factory)
@@ -63,6 +65,8 @@ def create_app(
         memories=memory_repository,
         traces=trace_repository,
         semantic_memory=SemanticMemory(knowledge_repository),
+        constructions=construction_repository,
+        language=pack.manifest.locale.split("-", maxsplit=1)[0].casefold(),
         lexicon=Lexicon.from_words({str(item["surface"]) for item in pack.lexicon}),
         input_constructions=ConstructionSet(
             declarative_items=tuple(pack.input_constructions)
@@ -74,6 +78,7 @@ def create_app(
     app = FastAPI(title="Mnesis", version="0.1.0")
     app.state.services = AppServices(
         instances=instance_repository,
+        constructions=construction_repository,
         knowledge=knowledge_repository,
         conversation=conversation,
         traces=trace_repository,
