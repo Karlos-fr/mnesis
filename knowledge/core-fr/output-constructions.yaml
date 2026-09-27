@@ -54,3 +54,14 @@
     - "D'après ce que j'ai appris, « {word} » signifie : {definition}"
   confidence: 0.95
   origin: knowledge_pack
+
+- id: fr-output-learning-event
+  language: fr
+  semantic_pattern:
+    type: LEARNING_EVENT
+    slots:
+      kind: LEXICAL
+  templates:
+    - "J'ai appris le mot « {term} »."
+  confidence: 0.95
+  origin: knowledge_pack
