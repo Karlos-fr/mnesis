@@ -128,18 +128,18 @@ git commit -m "feat: ajouter les représentations sémantiques génériques"
   - `ConstructionSet.match(text, lexicon) -> list[ConstructionMatch]`
   - `LanguageInterpreter.interpret(text, constructions, lexicon) -> list[SemanticFrame]`.
 
-- [ ] **Étape 1 : écrire un test de construction chargée depuis des données**
+- [x] **Étape 1 : écrire un test de construction chargée depuis des données**
 
 Créer en test une construction :
 `"coucou" -> SemanticFrame(type="SOCIAL_ACT", slots={"act": "GREETING"})`.
 
 Aucun mot `coucou` ne doit apparaître dans le code de production.
 
-- [ ] **Étape 2 : vérifier l’échec**
+- [x] **Étape 2 : vérifier l’échec**
 
 Exécuter : `pytest tests/unit/language/test_declarative_constructions.py -v`.
 
-- [ ] **Étape 3 : implémenter le matching générique**
+- [x] **Étape 3 : implémenter le matching générique**
 
 Le moteur doit supporter au minimum :
 - littéraux ;
@@ -148,11 +148,11 @@ Le moteur doit supporter au minimum :
 - captures ;
 - production d’un frame via substitution des variables.
 
-- [ ] **Étape 4 : ajouter le test d’ambiguïté**
+- [x] **Étape 4 : ajouter le test d’ambiguïté**
 
 Deux constructions matching le même texte doivent produire deux candidats.
 
-- [ ] **Étape 5 : vérifier et commit**
+- [x] **Étape 5 : vérifier et commit**
 
 ```bash
 pytest tests/unit/language/test_declarative_constructions.py -v
