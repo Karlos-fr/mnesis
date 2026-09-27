@@ -5,3 +5,6 @@ DEMANDER_CLARIFICATION:
   - Je ne suis pas certain d'avoir compris. Peux-tu préciser ?
 EXPRIMER_DOUTE:
   - Je ne suis pas certain de cette information.
+
+RELANCER:
+  - Comment vas-tu ?

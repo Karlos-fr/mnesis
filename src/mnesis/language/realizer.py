@@ -41,6 +41,10 @@ class SurfaceRealizer:
         """Signale qu'un mot inconnu vient d'être acquis par Mnesis."""
         return f"J'ai appris le mot « {word} »."
 
+    def follow_up(self) -> str:
+        """Retourne une formulation de relance issue du socle linguistique."""
+        return self._responses["RELANCER"][0]
+
     def clarification(self) -> str:
         """Retourne la formulation de clarification configurée dans le socle."""
         return self._responses["DEMANDER_CLARIFICATION"][0]

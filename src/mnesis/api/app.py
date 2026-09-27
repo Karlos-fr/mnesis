@@ -66,6 +66,7 @@ def create_app(
         constructions=ConstructionSet.default_french(),
         responses=pack.responses,
         learning=learning,
+        instances=instance_repository,
     )
 
     app = FastAPI(title="Mnesis", version="0.1.0")

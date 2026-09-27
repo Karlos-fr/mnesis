@@ -16,6 +16,7 @@ from mnesis.application.learning import LexicalLearningService
 from mnesis.domain.knowledge import Claim, ClaimStatus, Concept, KnowledgeOrigin
 from mnesis.domain.memory import Episode
 from mnesis.domain.traces import DecisionTrace
+from mnesis.infrastructure.repositories.instances import InstanceRepository
 from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
 from mnesis.infrastructure.repositories.memory import MemoryRepository
 from mnesis.infrastructure.repositories.traces import TraceRepository
@@ -46,6 +47,7 @@ class ConversationService:
         constructions: ConstructionSet,
         responses: dict[str, list[str]],
         learning: LexicalLearningService | None = None,
+        instances: InstanceRepository | None = None,
     ) -> None:
         """
         Initialise le service avec ses dépôts et ressources linguistiques.
@@ -65,6 +67,9 @@ class ConversationService:
                 Formulations contrôlées issues du socle linguistique.
             learning:
                 Service optionnel d'apprentissage lexical autonome.
+            instances:
+                Dépôt optionnel permettant de tenir compte de la personnalité
+                et de l'état affectif de l'instance.
         """
         self.knowledge = knowledge
         self.memories = memories
@@ -74,6 +79,7 @@ class ConversationService:
         self._realizer = SurfaceRealizer(responses)
         self._beliefs = BeliefEngine()
         self._learning = learning
+        self._instances = instances
 
     def handle(self, instance_id: UUID, text: str) -> ConversationTurn:
         """
@@ -95,11 +101,31 @@ class ConversationService:
         learned: list[UUID] = []
         consulted_concepts: list[UUID] = []
         consulted_claims: list[UUID] = []
+        affect_snapshot: dict[str, float] = {}
+        personality_curiosity = 0.0
+        personality_extraversion = 0.0
+
+        if self._instances is not None:
+            instance = self._instances.get(instance_id)
+            if instance is not None:
+                affect_snapshot = instance.affect.model_dump()
+                personality_curiosity = instance.personality.curiosity
+                personality_extraversion = instance.personality.extraversion
 
         if parsed.intent == "SALUER":
-            action = "RÉPONDRE"
-            response = self._realizer.greeting()
-            confidence = 0.95
+            curiosity = affect_snapshot.get("curiosity", 0.0)
+            if (
+                personality_curiosity >= 0.8
+                and personality_extraversion >= 0.6
+                and curiosity >= 0.8
+            ):
+                action = "RELANCER"
+                response = f"{self._realizer.greeting()} {self._realizer.follow_up()}"
+                confidence = 0.9
+            else:
+                action = "RÉPONDRE"
+                response = self._realizer.greeting()
+                confidence = 0.95
         elif parsed.intent == "DEFINIR":
             frame = parsed.semantic_frames[0]
             subject = self._ensure_concept(instance_id, frame["subject"], "entity")
@@ -120,11 +146,13 @@ class ConversationService:
             consulted_concepts.extend([subject.id, obj.id])
             consulted_claims.append(claim.id)
         elif parsed.intent == "DEMANDER_DEFINITION":
-            response, confidence, consulted_concepts, consulted_claims = self._answer_definition(
-                instance_id,
-                parsed.semantic_frames[0]["concept"].casefold(),
-                response,
-                confidence,
+            response, confidence, consulted_concepts, consulted_claims = (
+                self._answer_definition(
+                    instance_id,
+                    parsed.semantic_frames[0]["concept"].casefold(),
+                    response,
+                    confidence,
+                )
             )
             if consulted_claims:
                 action = "RÉPONDRE"
@@ -161,12 +189,12 @@ class ConversationService:
                     "DEMANDER_CLARIFICATION": (
                         0.9 if action == "DEMANDER_CLARIFICATION" else 0.2
                     ),
-                    "RELANCER": 0.1,
+                    "RELANCER": 0.9 if action == "RELANCER" else 0.1,
                 },
                 consulted_concepts=consulted_concepts,
                 consulted_claims=consulted_claims,
                 recalled_memories=[episode.id],
-                affect_snapshot={},
+                affect_snapshot=affect_snapshot,
             )
         )
         return ConversationTurn(
@@ -209,7 +237,9 @@ class ConversationService:
         if taxonomy_claims:
             assessment = self._beliefs.evaluate(taxonomy_claims)
             preferred = next(
-                claim for claim in taxonomy_claims if claim.id == assessment.preferred_claim_id
+                claim
+                for claim in taxonomy_claims
+                if claim.id == assessment.preferred_claim_id
             )
             obj = (
                 self.knowledge.get_concept(instance_id, preferred.object_id)
@@ -235,11 +265,16 @@ class ConversationService:
         if lexical_claims:
             assessment = self._beliefs.evaluate(lexical_claims)
             preferred = next(
-                claim for claim in lexical_claims if claim.id == assessment.preferred_claim_id
+                claim
+                for claim in lexical_claims
+                if claim.id == assessment.preferred_claim_id
             )
             if isinstance(preferred.literal, str):
                 return (
-                    self._realizer.lexical_definition(subject.label, preferred.literal),
+                    self._realizer.lexical_definition(
+                        subject.label,
+                        preferred.literal,
+                    ),
                     assessment.confidence,
                     [subject.id],
                     assessment.all_claim_ids,
