@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mnesis"
+version = "0.1.0"
+description = "Agent conversationnel cognitif non-LLM capable d'apprentissage explicite."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "alembic>=1.16",
+  "fastapi>=0.116",
+  "pydantic>=2.11",
+  "sqlalchemy>=2.0",
+  "uvicorn>=0.35",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28",
+  "mypy>=1.17",
+  "pytest>=9.0",
+  "ruff>=0.13",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+packages = ["mnesis"]
+mypy_path = "src"
