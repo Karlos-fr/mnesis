@@ -78,12 +78,14 @@ La première implémentation utilisera :
 
 - **Python 3.13+** pour le moteur cognitif ;
 - **FastAPI** pour l’exposition sous forme de service/API ;
-- **PostgreSQL** pour la persistance durable ;
+- **SQLite** pour la persistance V1, via SQLAlchemy et Alembic, avec compatibilité d’architecture prévue pour une migration ultérieure vers PostgreSQL ;
 - **TypeScript** pour une future interface navigateur.
 
 Le moteur cognitif ne doit pas dépendre de l’interface Web. Il doit pouvoir être utilisé depuis les tests, une interface en ligne de commande, l’API HTTP ou de futurs adaptateurs.
 
-La première version privilégiera une persistance relationnelle simple et des modèles de domaine explicites plutôt qu’une base de données graphe dédiée. Les connaissances sont naturellement structurées comme un graphe, mais PostgreSQL est suffisant au départ et facilite les transactions, la provenance, les tests et le déploiement.
+La première version privilégiera une persistance relationnelle simple et des modèles de domaine explicites plutôt qu’une base de données graphe dédiée. Les connaissances sont naturellement structurées comme un graphe, mais **SQLite** est suffisant pour la V1 et simplifie fortement l’installation locale, les tests et l’expérimentation.
+
+La couche de persistance doit toutefois passer par **SQLAlchemy** et **Alembic**, sans dépendances inutiles à des comportements propres à SQLite, afin de permettre une migration ultérieure vers **PostgreSQL** pour les déploiements publics, concurrents ou à plus grande échelle.
 
 ## 5. Architecture générale
 
@@ -229,7 +231,7 @@ Paris CAPITALE_DE France
 pomme PRODUIT_PAR pommier
 ```
 
-La première implémentation utilisera des entités et des relations explicites persistées dans PostgreSQL.
+La première implémentation utilisera des entités et des relations explicites persistées dans SQLite via SQLAlchemy.
 
 Chaque affirmation doit pouvoir contenir :
 
@@ -865,7 +867,7 @@ Les noms exacts des routes relèvent du plan d’implémentation et non de cette
 
 ## 31. Persistance
 
-PostgreSQL constitue la source durable de l’état du système.
+SQLite constitue la source durable de l’état du système pour la V1.
 
 Domaines principaux à persister :
 
@@ -885,7 +887,7 @@ Domaines principaux à persister :
 - sessions de recherche ;
 - déploiements de paquets de connaissances.
 
-Le détail du schéma sera précisé progressivement pendant l’implémentation.
+Le détail du schéma sera précisé progressivement pendant l’implémentation. La couche de persistance doit rester portable afin de permettre un passage ultérieur à PostgreSQL sans modifier le modèle cognitif.
 
 ## 32. Limites de sécurité et de ressources
 
