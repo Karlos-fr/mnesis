@@ -28,11 +28,7 @@ def test_assert_produces_semantic_frame() -> None:
             "ASSERT",
             {
                 "type": "PROPOSITION",
-                "slots": {
-                    "predicate": "IS_A",
-                    "subject": "chat",
-                    "object": "animal",
-                },
+                "slots": {"predicate": "IS_A", "subject": "chat", "object": "animal"},
             },
         ),
         {},
@@ -72,3 +68,41 @@ def test_research_produces_research_goal_side_effect() -> None:
     assert result.side_effects == [
         {"type": "RESEARCH", "goal": {"kind": "LEXICAL", "term": "arboricole"}}
     ]
+
+
+def test_store_uses_injected_semantic_memory_callback() -> None:
+    """Vérifie que STORE délègue la persistance au contexte générique."""
+    stored: list[str] = []
+    frame = {
+        "type": "PROPOSITION",
+        "slots": {"predicate": "IS_A", "subject": "chat", "object": "animal"},
+    }
+
+    def store_frame(value):
+        stored.append(value.slots["subject"])
+        return ["claim-1"]
+
+    result = ProcedureExecutor().execute(
+        _action("STORE", {"from_frame": True}),
+        {"input_frames": [frame], "store_frame": store_frame},
+    )
+    assert stored == ["chat"]
+    assert result.semantic_output is not None
+    assert result.learned_items == ["claim-1"]
+
+
+def test_retrieve_uses_injected_semantic_memory_callback() -> None:
+    """Vérifie que RETRIEVE délègue la requête à la mémoire sémantique injectée."""
+    def retrieve(query):
+        assert query == {"subject_label": "chat", "predicate": "IS_A"}
+        return {
+            "type": "PROPOSITION",
+            "slots": {"predicate": "IS_A", "subject": "chat", "object": "animal"},
+        }
+
+    result = ProcedureExecutor().execute(
+        _action("RETRIEVE", {"subject_label": "chat", "predicate": "IS_A"}),
+        {"retrieve": retrieve},
+    )
+    assert result.semantic_output is not None
+    assert result.semantic_output.slots["object"] == "animal"
