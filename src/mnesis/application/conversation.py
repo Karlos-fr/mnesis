@@ -16,6 +16,7 @@ from mnesis.cognition.rules import DeclarativeRule
 from mnesis.cognition.semantic_memory import SemanticMemory
 from mnesis.domain.memory import Episode
 from mnesis.domain.traces import DecisionTrace
+from mnesis.infrastructure.repositories.constructions import ConstructionRepository
 from mnesis.infrastructure.repositories.instances import InstanceRepository
 from mnesis.infrastructure.repositories.memory import MemoryRepository
 from mnesis.infrastructure.repositories.traces import TraceRepository
@@ -42,6 +43,8 @@ class ConversationService:
         memories: MemoryRepository,
         traces: TraceRepository,
         semantic_memory: SemanticMemory,
+        constructions: ConstructionRepository,
+        language: str,
         lexicon: Lexicon,
         input_constructions: ConstructionSet,
         rules: list[DeclarativeRule],
@@ -53,6 +56,8 @@ class ConversationService:
         self.memories = memories
         self.traces = traces
         self._semantic_memory = semantic_memory
+        self._constructions = constructions
+        self._language = language
         self._lexicon = lexicon
         self._input_constructions = input_constructions
         self._rules = rules
@@ -67,11 +72,20 @@ class ConversationService:
             "personality": instance.personality.model_dump(),
             "affect": instance.affect.model_dump(),
         }
+        local_constructions = self._constructions.list_for_instance(
+            instance_id, self._language
+        )
+        active_constructions = ConstructionSet(
+            declarative_items=(
+                self._input_constructions.declarative_items
+                + tuple(local_constructions)
+            )
+        )
         result = self._cycle.process(
             CognitiveEvent(text=text),
             state=state,
             lexicon=self._lexicon,
-            input_constructions=self._input_constructions,
+            input_constructions=active_constructions,
             rules=self._rules,
             output_constructions=self._output_constructions,
             procedure_context={
