@@ -35,6 +35,9 @@ class TraceRepository:
                     consulted_claims=[str(value) for value in trace.consulted_claims],
                     recalled_memories=[str(value) for value in trace.recalled_memories],
                     affect_snapshot=trace.affect_snapshot,
+                interpretations=trace.interpretations,
+                triggered_rules=trace.triggered_rules,
+                output_construction_id=trace.output_construction_id,
                 )
             )
         return trace
@@ -55,4 +58,7 @@ class TraceRepository:
                 consulted_claims=[UUID(value) for value in record.consulted_claims],
                 recalled_memories=[UUID(value) for value in record.recalled_memories],
                 affect_snapshot=record.affect_snapshot,
+                interpretations=record.interpretations,
+                triggered_rules=record.triggered_rules,
+                output_construction_id=record.output_construction_id,
             )
