@@ -349,20 +349,20 @@ Aucune procédure `SALUER` ou `DEFINIR`.
   - `OutputConstruction`
   - `LanguageRealizer.realize(frame, constructions, context) -> str`.
 
-- [ ] **Étape 1 : écrire le test “nouvelle sortie sans code”**
+- [x] **Étape 1 : écrire le test “nouvelle sortie sans code”**
 
 Définir dans le test une construction de sortie :
 `SOCIAL_ACT(GREETING) -> "Bonjour."`.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : implémenter sélection + substitution générique**
+- [x] **Étape 3 : implémenter sélection + substitution générique**
 
-- [ ] **Étape 4 : tester plusieurs variantes**
+- [x] **Étape 4 : tester plusieurs variantes**
 
 Sélection déterministe pour la V1 ; variation pourra venir ensuite.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
