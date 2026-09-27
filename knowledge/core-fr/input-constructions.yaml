@@ -1,0 +1,78 @@
+- id: fr-greeting-bonjour
+  language: fr
+  pattern:
+    - literal: bonjour
+  semantics:
+    type: SOCIAL_ACT
+    slots:
+      act: GREETING
+  confidence: 0.99
+  origin: knowledge_pack
+- id: fr-greeting-salut
+  language: fr
+  pattern:
+    - literal: salut
+  semantics:
+    type: SOCIAL_ACT
+    slots:
+      act: GREETING
+  confidence: 0.99
+  origin: knowledge_pack
+- id: fr-is-a-masculine
+  language: fr
+  pattern:
+    - variable: subject
+    - literal: est
+    - literal: un
+    - variable: object
+  semantics:
+    type: PROPOSITION
+    slots:
+      predicate: IS_A
+      subject: $subject
+      object: $object
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-is-a-feminine
+  language: fr
+  pattern:
+    - variable: subject
+    - literal: est
+    - literal: une
+    - variable: object
+  semantics:
+    type: PROPOSITION
+    slots:
+      predicate: IS_A
+      subject: $subject
+      object: $object
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-definition-query-masculine
+  language: fr
+  pattern:
+    - literal: qu'est-ce
+    - literal: qu'un
+    - variable: target
+    - literal: "?"
+  semantics:
+    type: QUERY
+    slots:
+      kind: DEFINITION
+      target: $target
+  confidence: 0.95
+  origin: knowledge_pack
+- id: fr-definition-query-feminine
+  language: fr
+  pattern:
+    - literal: qu'est-ce
+    - literal: qu'une
+    - variable: target
+    - literal: "?"
+  semantics:
+    type: QUERY
+    slots:
+      kind: DEFINITION
+      target: $target
+  confidence: 0.95
+  origin: knowledge_pack
