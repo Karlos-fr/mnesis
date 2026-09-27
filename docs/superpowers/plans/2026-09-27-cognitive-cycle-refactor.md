@@ -275,15 +275,15 @@ git commit -m "feat: ajouter le moteur de règles déclaratives"
   - `ActionEngine.rank(candidates, state) -> list[ActionCandidate]`
   - `ActionEngine.select(...) -> ActionCandidate`.
 
-- [ ] **Étape 1 : écrire le test de scoring**
+- [x] **Étape 1 : écrire le test de scoring**
 
 Une action `ASK` reçoit un bonus de curiosité/extraversion selon des modificateurs décrits dans la donnée de règle.
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
 Exécuter : `pytest tests/unit/cognition/test_actions.py -v`.
 
-- [ ] **Étape 3 : implémenter le score générique**
+- [x] **Étape 3 : implémenter le score générique**
 
 Aucun test de type :
 `if action == "RELANCER"`.
@@ -291,11 +291,11 @@ Aucun test de type :
 Les modificateurs utilisent un chemin d’état générique, par exemple :
 `personality.curiosity`, `affect.curiosity`.
 
-- [ ] **Étape 4 : tester égalité de scores**
+- [x] **Étape 4 : tester égalité de scores**
 
 Départage stable et déterministe.
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ```bash
 git add src/mnesis/cognition tests/unit/cognition
