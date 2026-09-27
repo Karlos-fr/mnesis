@@ -13,11 +13,12 @@ from fastapi.staticfiles import StaticFiles
 from mnesis.api.dependencies import AppServices
 from mnesis.api.routes import conversations, diagnostics, instances
 from mnesis.application.conversation import ConversationService
-from mnesis.application.learning import DictionarySource
+from mnesis.application.learning import DictionarySource, LexicalLearningService
 from mnesis.cognition.actions import ActionEngine
 from mnesis.cognition.cycle import CognitiveCycle
 from mnesis.cognition.procedures import ProcedureExecutor
 from mnesis.cognition.rules import RuleEngine
+from mnesis.cognition.research import ResearchExecutor
 from mnesis.cognition.semantic_memory import SemanticMemory
 from mnesis.infrastructure.db import create_database, create_schema
 from mnesis.infrastructure.knowledge_packs import load_knowledge_pack
@@ -26,6 +27,7 @@ from mnesis.infrastructure.repositories.instances import InstanceRepository
 from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
 from mnesis.infrastructure.repositories.memory import MemoryRepository
 from mnesis.infrastructure.repositories.traces import TraceRepository
+from mnesis.infrastructure.wiktionary import WiktionarySource
 from mnesis.language.constructions import ConstructionSet, Lexicon
 from mnesis.language.interpreter import LanguageInterpreter
 from mnesis.language.realization import LanguageRealizer
@@ -43,7 +45,6 @@ def create_app(
     Le paramètre dictionary_source est conservé pour compatibilité et sera
     raccordé à l'action générique RESEARCH dans une tâche ultérieure.
     """
-    del dictionary_source
     database = create_database(database_url)
     create_schema(database.engine)
     instance_repository = InstanceRepository(database.session_factory)
@@ -52,6 +53,10 @@ def create_app(
     memory_repository = MemoryRepository(database.session_factory)
     trace_repository = TraceRepository(database.session_factory)
     pack = load_knowledge_pack(core_fr_path)
+    lexical_learning = LexicalLearningService(
+        knowledge_repository, dictionary_source or WiktionarySource()
+    )
+    research = ResearchExecutor(lexical_learning)
     cycle = CognitiveCycle(
         interpreter=LanguageInterpreter(),
         rule_engine=RuleEngine(),
@@ -65,6 +70,7 @@ def create_app(
         memories=memory_repository,
         traces=trace_repository,
         semantic_memory=SemanticMemory(knowledge_repository),
+        research=research,
         constructions=construction_repository,
         language=pack.manifest.locale.split("-", maxsplit=1)[0].casefold(),
         lexicon=Lexicon.from_words({str(item["surface"]) for item in pack.lexicon}),
