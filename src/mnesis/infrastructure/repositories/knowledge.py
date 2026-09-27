@@ -11,8 +11,9 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from mnesis.domain.knowledge import Claim, ClaimStatus, Evidence, KnowledgeOrigin
-from mnesis.infrastructure.db import ClaimRecord
+from mnesis.domain.knowledge import Claim, ClaimStatus, Concept, Evidence, KnowledgeOrigin
+from mnesis.domain.language import Lexeme, LexicalSense, MasteryLevel
+from mnesis.infrastructure.db import ClaimRecord, ConceptRecord, LexemeRecord
 
 
 class KnowledgeRepository:
@@ -21,6 +22,27 @@ class KnowledgeRepository:
     def __init__(self, session_factory: sessionmaker) -> None:
         """Initialise le dépôt avec la fabrique de sessions fournie."""
         self._session_factory = session_factory
+
+    def add_concept(self, instance_id: UUID, concept: Concept) -> Concept:
+        """Persiste un concept local à une instance et le retourne inchangé."""
+        with self._session_factory.begin() as session:
+            session.add(ConceptRecord(id=str(concept.id), instance_id=str(instance_id), kind=concept.kind, label=concept.label))
+        return concept
+
+    def add_lexeme(self, instance_id: UUID, lexeme: Lexeme) -> Lexeme:
+        """Persiste un lexème et ses liens vers des concepts pour une instance."""
+        with self._session_factory.begin() as session:
+            session.add(LexemeRecord(id=str(lexeme.id), instance_id=str(instance_id), surface=lexeme.surface, lemma=lexeme.lemma, language=lexeme.language, part_of_speech=lexeme.part_of_speech, senses=[sense.model_dump(mode="json") for sense in lexeme.senses], mastery=lexeme.mastery.value))
+        return lexeme
+
+    def find_lexeme(self, instance_id: UUID, word: str) -> Lexeme | None:
+        """Recherche un lexème par forme ou lemme dans une instance donnée."""
+        normalized = word.casefold()
+        with self._session_factory() as session:
+            record = session.scalars(select(LexemeRecord).where(LexemeRecord.instance_id == str(instance_id), (LexemeRecord.lemma == normalized) | (LexemeRecord.surface == normalized)).limit(1)).first()
+        if record is None:
+            return None
+        return Lexeme(id=UUID(record.id), surface=record.surface, lemma=record.lemma, language=record.language, part_of_speech=record.part_of_speech, senses=[LexicalSense.model_validate(item) for item in record.senses], mastery=MasteryLevel(record.mastery))
 
     def add_claim(self, instance_id: UUID, claim: Claim) -> Claim:
         """Persiste une affirmation pour l'instance donnée et la retourne inchangée."""
