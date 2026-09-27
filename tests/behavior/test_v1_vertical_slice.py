@@ -13,7 +13,10 @@ from mnesis.application.learning import DictionaryEntry, LexicalLearningService
 from mnesis.domain.instances import MnesisInstance
 from mnesis.domain.knowledge import KnowledgeOrigin
 from mnesis.infrastructure.db import create_database, create_schema
-from mnesis.infrastructure.knowledge_packs import deploy_knowledge_pack, load_knowledge_pack
+from mnesis.infrastructure.knowledge_packs import (
+    deploy_knowledge_pack,
+    load_knowledge_pack,
+)
 from mnesis.infrastructure.repositories.instances import InstanceRepository
 from mnesis.infrastructure.repositories.knowledge import KnowledgeRepository
 from mnesis.infrastructure.repositories.memory import MemoryRepository

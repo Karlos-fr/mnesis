@@ -37,7 +37,10 @@ class ConceptRecord(Base):
 
     __tablename__ = "concepts"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    instance_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
     kind: Mapped[str] = mapped_column(String(64), nullable=False)
     label: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -47,7 +50,10 @@ class LexemeRecord(Base):
 
     __tablename__ = "lexemes"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    instance_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
     surface: Mapped[str] = mapped_column(String(255), nullable=False)
     lemma: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     language: Mapped[str] = mapped_column(String(16), nullable=False)
@@ -63,7 +69,8 @@ class EpisodeRecord(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     instance_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"),
+        nullable=False, index=True,
     )
     occurred_at: Mapped[str] = mapped_column(String(64), nullable=False)
     summary: Mapped[str] = mapped_column(String(1000), nullable=False)
@@ -78,8 +85,12 @@ class TraceRecord(Base):
 
     __tablename__ = "decision_traces"
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    instance_id: Mapped[str] = mapped_column(String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True)
+    instance_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"),
+        nullable=False, index=True,
+    )
     action: Mapped[str] = mapped_column(String(64), nullable=False)
+    confidence: Mapped[float] = mapped_column(Float, nullable=False, default=0.5)
     candidate_actions: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False)
     consulted_concepts: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     consulted_claims: Mapped[list[str]] = mapped_column(JSON, nullable=False)
@@ -94,7 +105,8 @@ class ClaimRecord(Base):
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     instance_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("instances.id", ondelete="CASCADE"), nullable=False, index=True
+        String(36), ForeignKey("instances.id", ondelete="CASCADE"),
+        nullable=False, index=True,
     )
     subject_id: Mapped[str] = mapped_column(String(36), nullable=False)
     predicate: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -103,7 +115,9 @@ class ClaimRecord(Base):
     confidence: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(32), nullable=False)
     origin: Mapped[str] = mapped_column(String(32), nullable=False)
-    evidence: Mapped[list[dict[str, Any]]] = mapped_column(JSON, nullable=False, default=list)
+    evidence: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSON, nullable=False, default=list,
+    )
 
 
 @dataclass(frozen=True)
@@ -133,7 +147,10 @@ def create_database(url: str) -> Database:
             # la même base SQLite en mémoire.
             kwargs["poolclass"] = StaticPool
     engine = create_engine(url, **kwargs)
-    return Database(engine=engine, session_factory=sessionmaker(engine, expire_on_commit=False))
+    return Database(
+        engine=engine,
+        session_factory=sessionmaker(engine, expire_on_commit=False),
+    )
 
 
 def create_schema(engine: Engine) -> None:
