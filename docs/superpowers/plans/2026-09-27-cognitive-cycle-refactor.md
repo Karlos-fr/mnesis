@@ -585,15 +585,15 @@ Mot inconnu → règle déclarative → action `RESEARCH(kind=LEXICAL)` → sour
   - score final ;
   - construction de sortie utilisée.
 
-- [ ] **Étape 1 : écrire le test API**
+- [x] **Étape 1 : écrire le test API**
 
-- [ ] **Étape 2 : constater l’échec**
+- [x] **Étape 2 : constater l’échec**
 
-- [ ] **Étape 3 : enrichir la trace sans exposer les détails dans la conversation principale**
+- [x] **Étape 3 : enrichir la trace sans exposer les détails dans la conversation principale**
 
-- [ ] **Étape 4 : vérifier**
+- [x] **Étape 4 : vérifier**
 
-- [ ] **Étape 5 : commit**
+- [x] **Étape 5 : commit**
 
 ---
 
